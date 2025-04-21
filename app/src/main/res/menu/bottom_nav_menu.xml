@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/frg_contact"
+        android:icon="@drawable/ic_list_contact"
+        android:title="Danh bạ" />
+    <item
+        android:id="@+id/frg_schedule"
+        android:icon="@drawable/ic_calendar"
+        android:title="Lịch hẹn" />
+    <item
+        android:id="@+id/frg_chart"
+        android:icon="@drawable/ic_chart"
+        android:title="Biểu đồ" />
+</menu>

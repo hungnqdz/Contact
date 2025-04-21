@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_home"
+    app:startDestination="@id/frg_contact">
+    <fragment
+        android:id="@+id/frg_contact"
+        android:name="com.contact_app.contact.fragment.HomeFragment" />
+
+    <fragment
+        android:id="@+id/frg_schedule"
+        android:name="com.contact_app.contact.fragment.ListScheduleFragment" />
+
+    <fragment
+        android:id="@+id/frg_chart"
+        android:name="com.contact_app.contact.fragment.ChartFragment" />
+</navigation>
