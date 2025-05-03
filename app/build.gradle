@@ -118,6 +118,13 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
+    //ssp dsp
+    implementation 'com.intuit.sdp:sdp-android:1.1.1'
+    implementation 'com.intuit.ssp:ssp-android:1.1.1'
+
+    //Radio Group
+    implementation 'com.github.worker8:radiogroupplus:1.0.1'
+
     // zoom image
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
 

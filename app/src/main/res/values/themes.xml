@@ -5,5 +5,10 @@
          <item name="colorPrimary">#1B72C0</item>
     </style>
 
+    <style name="roundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
     <style name="Theme.Contact" parent="Base.Theme.Contact" />
 </resources>
