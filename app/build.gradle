@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id 'kotlin-kapt'
 }
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace 'com.contact_app.contact'
@@ -127,6 +128,7 @@ dependencies {
 
     // zoom image
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+    implementation "androidx.sqlite:sqlite:2.4.0"
 
 }
 kapt {

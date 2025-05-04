@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sort" android:title="Sắp xếp theo" />
+    <item android:id="@+id/sync" android:title="Đồng bộ hóa" />
+    <item android:id="@+id/private_storage" android:title="Lưu trữ an toàn" />
+</menu>

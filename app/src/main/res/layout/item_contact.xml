@@ -1,131 +1,227 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:background="#E5E7EB"
-    android:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/img_avatar"
-        android:layout_width="@dimen/_35sdp"
-        android:layout_height="@dimen/_35sdp"
-        android:layout_marginTop="@dimen/_15sdp"
-        android:layout_marginStart="@dimen/_15sdp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/avt"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/roundedImageView" />
+    <data>
+        <variable
+            name="item"
+            type="com.contact_app.contact.model.Contact" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:orientation="vertical"
-        app:layout_constraintStart_toEndOf="@id/img_avatar"
-        app:layout_constraintTop_toTopOf="@id/img_avatar">
+        <variable
+            name="position"
+            type="Integer" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nam"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+        <variable
+            name="keySearchFirstName"
+            type="String" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_company"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="BKAV"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_15ssp" />
-    </LinearLayout>
+        <variable
+            name="keySearchEmail"
+            type="String" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/toolbar"
+        <variable
+            name="keySearchPhone"
+            type="String" />
+
+        <variable
+            name="keySearchCompany"
+            type="String" />
+
+        <variable
+            name="searchColumn"
+            type="com.contact_app.contact.adapter.SearchColumn" />
+
+        <import type="com.contact_app.contact.adapter.SearchColumn"/>
+
+        <variable
+            name="onItemClick"
+            type="com.contact_app.contact.base.OnItemClickListener&lt;com.contact_app.contact.model.Contact>" />
+
+        <variable
+            name="onItemLongClick"
+            type="com.contact_app.contact.base.OnLongClickListener&lt;com.contact_app.contact.model.Contact>" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:backgroundTint="@color/white"
-        android:background="@drawable/border_layout"
-        android:layout_marginTop="@dimen/_15sdp"
+        android:onClick="@{v-> onItemClick.onItemClicked(item)}"
+        android:longClickable="true"
+        android:clickable="true"
+        android:background="@drawable/bg_round_10bp"
         android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_marginHorizontal="@dimen/_5sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_avatar">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/btn_call"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/f_char"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/_10sdp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_marginTop="@dimen/_15sdp"
+            android:text='@{item.firstName != null &amp;&amp; !item.firstName.isEmpty() ? item.firstName.substring(0,1) : ""}'
+            android:textSize="@dimen/_14ssp"
+            android:textColor="@color/black"
+            isVisible="@{item.isFirstOfChar()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                app:srcCompat="@drawable/ic_call" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_round_10bp"
+            android:backgroundTint="@{item.isLongClicked() ? @color/e5e7eb : @color/white}"
+            android:backgroundTintMode="screen"
+            app:layout_constraintTop_toBottomOf="@id/f_char">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/img_avatar"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/roundedImageView" />
+
+            <LinearLayout
+                android:id="@+id/postLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Gọi"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_10sdp" />
+                android:layout_marginStart="@dimen/_10sdp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toEndOf="@id/img_avatar"
+                app:layout_constraintTop_toTopOf="@id/img_avatar">
 
-        </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.firstName + ` ` + item.lastName}"
+                    app:keySearch="@{keySearchFirstName}"
+                    app:textData="@{item.firstName + ` ` + item.lastName}"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13ssp" />
 
-        <LinearLayout
-            android:id="@+id/btn_edit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.phone}"
+                    android:textColor="@color/_71717a"
+                    app:keySearch="@{keySearchPhone}"
+                    app:textData="@{item.phone}"
+                    android:textSize="@dimen/_12ssp" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                app:srcCompat="@drawable/ic_edit" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_company"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.company}"
+                    android:textColor="@color/_71717a"
+                    app:keySearch="@{keySearchCompany}"
+                    app:textData="@{item.company}"
+                    isVisible="@{!keySearchCompany.toString().empty}"
+                    android:textSize="@dimen/_12ssp" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.email}"
+                    android:textColor="@color/_71717a"
+                    app:keySearch="@{keySearchEmail}"
+                    app:textData="@{item.email}"
+                    isVisible="@{!keySearchEmail.toString().empty}"
+                    android:textSize="@dimen/_12ssp" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sửa"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_10sdp" />
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
+                android:background="@drawable/border_layout"
+                android:backgroundTint="@color/white"
+                android:gravity="center"
+                android:orientation="horizontal"
+                isVisible="@{item.isLongClicked()}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/img_avatar">
 
-        </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/btn_call"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/btn_schedule"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        app:srcCompat="@drawable/ic_call" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                app:srcCompat="@drawable/ic_schedule" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Gọi"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_10sdp" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lên lịch hẹn"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_10sdp" />
-        </LinearLayout>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        app:srcCompat="@drawable/ic_edit" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Sửa"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_10sdp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_schedule"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        app:srcCompat="@drawable/ic_schedule" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Lên lịch hẹn"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_10sdp" />
+                </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

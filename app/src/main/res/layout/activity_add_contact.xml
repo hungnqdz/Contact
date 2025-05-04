@@ -1,167 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical"
-    tools:context=".DetailContactActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+
+        <variable
+            name="contact"
+            type="com.contact_app.contact.model.Contact" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_30sdp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        tools:context=".DetailContactActivity">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btn_back"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:padding="@dimen/_5sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_back" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Liên hệ mới"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_20ssp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/img_avatar"
-                android:layout_width="@dimen/_70sdp"
-                android:layout_height="@dimen/_70sdp"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_back"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:padding="@dimen/_5sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_back" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/avt"
-                app:shapeAppearanceOverlay="@style/roundedImageView" />
+                android:text="Liên hệ mới"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_20ssp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Số điện thoại"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="phone"
-                    android:text="09347837843"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Tên"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:text="Hùng"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Họ"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:text="Nguyễn"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Email"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:text="youremail@domain.com"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/img_avatar"
+                    android:layout_width="@dimen/_70sdp"
+                    android:layout_height="@dimen/_70sdp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/big_ava"
+                    app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/_5sdp"
-                    android:layout_weight="1"
-                    android:hint="Giới tính"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Số điện thoại"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                    app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                    app:boxStrokeColor="@color/primary">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone"
+                        android:text="@{contact.phone}"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Tên"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                    app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                    app:boxStrokeColor="@color/primary">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:text="@{contact.firstName}"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Họ"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                    app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                    app:boxStrokeColor="@color/primary">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:text="@{contact.lastName}"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Email"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                    app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                    app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                    app:boxStrokeColor="@color/primary">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:text="@{contact.email}"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_5sdp"
+                        android:layout_weight="1"
+                        android:hint="Giới tính"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                        app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                        app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                        app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                        app:boxStrokeColor="@color/primary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:text="@{contact.gender == `Female` ? `Nữ`: `Nam`}"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_13ssp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_5sdp"
+                        android:layout_weight="1"
+                        android:hint="Ngày sinh"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
+                        app:boxCornerRadiusBottomStart="@dimen/_10sdp"
+                        app:boxCornerRadiusTopEnd="@dimen/_10sdp"
+                        app:boxCornerRadiusTopStart="@dimen/_10sdp"
+                        app:boxStrokeColor="@color/primary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="date"
+                            android:text="22/03/2003"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_13ssp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Địa chỉ"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
                     app:boxCornerRadiusBottomStart="@dimen/_10sdp"
@@ -173,17 +228,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
-                        android:text="Nam"
+                        android:text="@{contact.address}"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13ssp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_5sdp"
-                    android:layout_weight="1"
-                    android:hint="Ngày sinh"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    android:hint="Công ty"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
                     app:boxCornerRadiusBottomStart="@dimen/_10sdp"
@@ -194,80 +249,36 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="date"
-                        android:text="22/03/2003"
+                        android:inputType="text"
+                        android:text="@{contact.company}"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13ssp" />
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <FrameLayout
+                    android:id="@+id/btn_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:background="@drawable/border_layout"
+                    android:backgroundTint="@color/primary"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv2">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="@dimen/_10sdp"
+                        android:text="LƯU"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+                </FrameLayout>
             </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Địa chỉ"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="45 New Avenue, New York"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginVertical="@dimen/_6sdp"
-                android:hint="Công ty"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
-                app:boxCornerRadiusBottomStart="@dimen/_10sdp"
-                app:boxCornerRadiusTopEnd="@dimen/_10sdp"
-                app:boxCornerRadiusTopStart="@dimen/_10sdp"
-                app:boxStrokeColor="@color/primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="Abc"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <FrameLayout
-                android:id="@+id/btn_save"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:background="@drawable/border_layout"
-                android:backgroundTint="@color/primary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv2">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="@dimen/_10sdp"
-                    android:text="LƯU"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-            </FrameLayout>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

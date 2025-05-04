@@ -27,7 +27,7 @@
             android:background="@color/white"
             app:itemIconTint="@drawable/selector_item_bottom_nav"
             app:itemTextColor="@drawable/selector_item_bottom_nav"
-            app:labelVisibilityMode="selected"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

@@ -1,20 +1,44 @@
 package com.contact_app.contact
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.contact_app.contact.base.BaseActivity
+import com.contact_app.contact.databinding.ActivityDetailContactBinding
+import com.contact_app.contact.model.Contact
 
-class DetailContactActivity : AppCompatActivity() {
+class DetailContactActivity : BaseActivity<ActivityDetailContactBinding>(){
+    override val layoutId: Int
+        get() = R.layout.activity_detail_contact
+
+    private lateinit var contact: Contact
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        contact = intent.getSerializableExtra("contact") as? Contact ?: Contact()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_detail_contact)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        viewBinding.apply {
+            contact = this@DetailContactActivity.contact
+            btnBack.setOnClickListener {
+                finish()
+            }
+            btnCall.setOnClickListener {
+                val phone = this@DetailContactActivity.contact.phone
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.data = Uri.parse("tel:$phone")
+                startActivity(intent)
+            }
+
+            btnSendEmail.setOnClickListener {
+                val email = this@DetailContactActivity.contact.email
+                val intent = Intent(Intent.ACTION_SENDTO)
+                intent.setData(Uri.parse("mailto:$email")) // only email apps should handle this
+                intent.putExtra(Intent.EXTRA_EMAIL, email)
+                intent.putExtra(Intent.EXTRA_SUBJECT, "")
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivity(intent)
+                }
+            }
         }
     }
+
 }

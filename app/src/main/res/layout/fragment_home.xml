@@ -5,6 +5,13 @@
 
     <data>
 
+        <variable
+            name="adapter"
+            type="com.contact_app.contact.adapter.ContactAdapter" />
+
+        <variable
+            name="numberContact"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,14 +22,15 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ic_app"
             android:layout_width="@dimen/_80sdp"
-            android:layout_height="@dimen/_50sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginStart="@dimen/_15sdp"
-            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_app" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/dropdown_menu"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_15sdp"
@@ -55,28 +63,49 @@
                 android:layout_marginStart="@dimen/_8sdp"
                 android:layout_weight="1"
                 android:background="@color/white"
-                android:inputType="text"
                 android:hint="Nhập từ khóa"
+                android:inputType="text"
                 android:textColor="#6B7280"
-                android:textSize="@dimen/_13ssp" />
+                android:textSize="@dimen/_12ssp" />
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/dropdown_btn"
             android:layout_width="@dimen/_100sdp"
             android:layout_height="wrap_content"
+            android:minHeight="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
             android:background="@drawable/border_layout"
-            android:drawableEnd="@drawable/ic_drop_down"
             android:drawablePadding="8dp"
             android:gravity="center"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_5sdp"
+            android:padding="@dimen/_3sdp"
+            android:spinnerMode="dropdown"
             android:text="Công ty"
             android:textSize="@dimen/_10ssp"
-            android:layout_marginEnd="@dimen/_15sdp"
+            app:layout_constraintBottom_toBottomOf="@id/search_box"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/search_box"
-            app:layout_constraintBottom_toBottomOf="@id/search_box"/>
+            app:layout_constraintTop_toTopOf="@id/search_box" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/contact_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_26ssp"
+            android:text="Danh bạ"
+            android:textSize="@dimen/_26ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_box" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/contact_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{numberContact.toString() + ` liên hệ đã được lưu`}"
+            android:textSize="@dimen/_13ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/contact_label" />
 
         <View
             android:id="@+id/view"
@@ -84,31 +113,34 @@
             android:layout_height="@dimen/_1sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:background="#D4D4D4"
-            app:layout_constraintTop_toBottomOf="@id/search_box"/>
+            app:layout_constraintTop_toBottomOf="@id/search_box" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_item"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:layout_marginHorizontal="@dimen/_15sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            tools:listitem="@layout/item_contact"
+            android:adapter="@{adapter}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view" />
+            app:layout_constraintTop_toBottomOf="@+id/contact_num"
+            tools:listitem="@layout/item_contact" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_call"
             android:layout_width="@dimen/_45sdp"
             android:layout_height="@dimen/_45sdp"
-            app:srcCompat="@drawable/ic_keypad"
-            android:background="@drawable/border_button"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_20sdp"
+            android:background="@drawable/border_button"
             android:elevation="@dimen/_5sdp"
             android:padding="@dimen/_10sdp"
             app:layout_constraintBottom_toBottomOf="@id/list_item"
-            app:layout_constraintEnd_toEndOf="@id/list_item"/>
+            app:layout_constraintEnd_toEndOf="@id/list_item"
+            app:srcCompat="@drawable/ic_keypad" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
