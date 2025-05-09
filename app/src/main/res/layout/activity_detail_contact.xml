@@ -76,7 +76,7 @@
                     android:layout_marginHorizontal="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_15sdp"
                     android:layout_marginBottom="@dimen/_5sdp"
-                    android:background="@drawable/border_layout"
+                    android:background="@drawable/border_black"
                     android:backgroundTint="@color/white"
                     android:gravity="center"
                     android:orientation="horizontal"

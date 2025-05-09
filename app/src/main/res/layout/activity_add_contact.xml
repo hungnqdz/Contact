@@ -261,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:background="@drawable/border_layout"
+                    android:background="@drawable/border_black"
                     android:backgroundTint="@color/primary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:minHeight="@dimen/_20sdp"
             android:layout_marginEnd="@dimen/_15sdp"
-            android:background="@drawable/border_layout"
+            android:background="@drawable/border_black"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
