@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_15sdp"
-            android:text='@{item.firstName != null &amp;&amp; !item.firstName.isEmpty() ? item.firstName.substring(0,1) : ""}'
+            android:text='@{item.firstName != null &amp;&amp; !item.firstName.isEmpty() ? item.firstName.substring(0,1).toUpperCase() : ""}'
             android:textSize="@dimen/_14ssp"
             android:textColor="@color/black"
             isVisible="@{item.isFirstOfChar()}"

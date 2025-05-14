@@ -71,6 +71,7 @@
                     app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/phone_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -84,6 +85,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/phone_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="phone"
@@ -93,6 +95,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/first_name_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -106,6 +109,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/first_name_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
@@ -116,6 +120,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/last_name_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -129,6 +134,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/last_name_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
@@ -138,6 +144,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/email_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -151,6 +158,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"
@@ -167,6 +175,7 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/gender_input_layout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/_5sdp"
@@ -180,6 +189,7 @@
                         app:boxStrokeColor="@color/primary">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/gender_edit_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="text"
@@ -189,11 +199,13 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/birthday_input_layout"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginStart="@dimen/_5sdp"
                         android:layout_weight="1"
                         android:hint="Ngày sinh"
+                        android:gravity="center_vertical"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusBottomEnd="@dimen/_10sdp"
                         app:boxCornerRadiusBottomStart="@dimen/_10sdp"
@@ -202,16 +214,20 @@
                         app:boxStrokeColor="@color/primary">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tv_birthday"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="date"
-                            android:text="22/03/2003"
+                            android:inputType="none"
+                            android:text="@{contact.birthContact}"
                             android:textColor="@color/black"
-                            android:textSize="@dimen/_13ssp" />
+                            android:textSize="@dimen/_13ssp"
+                            android:focusable="false"
+                            android:clickable="true" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/address_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -225,6 +241,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/address_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
@@ -234,6 +251,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/company_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -247,6 +265,7 @@
                     app:boxStrokeColor="@color/primary">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/company_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"

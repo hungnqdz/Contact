@@ -1,6 +1,7 @@
 package com.contact_app.contact
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.contact_app.contact.base.BaseActivity
 import com.contact_app.contact.databinding.ActivityMainBinding
+import java.io.File
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     var navController: NavController? = null
@@ -19,6 +21,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getDatabaseFile()
         viewBinding.apply {
             navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.frg_container) as NavHostFragment
@@ -39,5 +42,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 }
             }
         }
+    }
+
+    fun getDatabaseFile(): File {
+        val dbPath = applicationContext.getDatabasePath("contact_database.db").path
+        Log.d("DB",dbPath)
+        return File(dbPath)
     }
 }

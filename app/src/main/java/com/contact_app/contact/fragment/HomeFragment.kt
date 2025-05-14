@@ -11,15 +11,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.contact_app.contact.DetailContactActivity
+import com.contact_app.contact.FormContactActivity
 import com.contact_app.contact.R
 import com.contact_app.contact.adapter.ContactAdapter
 import com.contact_app.contact.adapter.SearchColumn
 import com.contact_app.contact.adapter.SearchSpinnerAdapter
 import com.contact_app.contact.base.OnItemClickListener
 import com.contact_app.contact.base.OnLongClickListener
+import com.contact_app.contact.base.dragging
 import com.contact_app.contact.databinding.FragmentHomeBinding
 import com.contact_app.contact.db.ContactDatabaseHelper
 import com.contact_app.contact.dialog.DialogSort
@@ -147,6 +150,11 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                         R.id.private_storage -> {
                             true
                         }
+                        R.id.add_contact -> {
+                            val intent = Intent(requireContext(),FormContactActivity::class.java)
+                            startActivityForResult(intent,3)
+                            true
+                        }
 
                         else -> false
                     }
@@ -158,6 +166,7 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                 intent.data = Uri.parse("tel:")
                 startActivity(intent)
             }
+            btnCall.setOnTouchListener(dragging)
         }
         adapter.submitList(listContacts)
 
@@ -178,6 +187,18 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
         super.onItemClicked(item)
         val intent = Intent(requireContext(),DetailContactActivity::class.java)
         intent.putExtra("contact",item)
-        startActivity(intent)
+        startActivityForResult(intent,2)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if ((requestCode == 2 || requestCode == 3) && resultCode == RESULT_OK) {
+            val result = data?.getBooleanExtra("isUpdate",false)
+            val resultCreate = data?.getBooleanExtra("isCreate",false)
+            if (result == true || resultCreate == true){
+                adapter.submitList(dbHelper.getAllContacts())
+                viewBinding.numberContact = dbHelper.countContacts()
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.contact_app.contact.adapter
+package com.contact_app.contact.base
 
 import android.content.DialogInterface
 import android.content.res.Resources
@@ -13,8 +13,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-abstract class BaseDialog<ViewBinding : ViewDataBinding> : DialogFragment() {
+abstract class BaseBottomSheet <ViewBinding : ViewDataBinding> : BottomSheetDialogFragment() {
     private var isShowing = false
     protected lateinit var viewBinding: ViewBinding
 
@@ -44,11 +45,6 @@ abstract class BaseDialog<ViewBinding : ViewDataBinding> : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.decorView?.background = ColorDrawable(Color.TRANSPARENT)
-        val marginInPx = (10 * resources.displayMetrics.density).toInt()
-        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val width = screenWidth - 2 * marginInPx
-
-        dialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun show(manager: FragmentManager, tag: String?) {

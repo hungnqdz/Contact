@@ -3,9 +3,8 @@ package com.contact_app.contact.dialog
 import android.os.Bundle
 import android.view.View
 import com.contact_app.contact.R
-import com.contact_app.contact.adapter.BaseDialog
+import com.contact_app.contact.base.BaseDialog
 import com.contact_app.contact.databinding.DialogSortBinding
-import javax.inject.Inject
 
 class DialogSort() : BaseDialog<DialogSortBinding>() {
     override val layoutId: Int

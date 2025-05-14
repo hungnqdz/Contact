@@ -8,25 +8,38 @@ import java.util.Date
 
 
 data class Contact(
-    val id: Int? = null,
-    val firstName: String? = "",
-    val lastName: String? = "",
-    val email: String? = "",
-    val phone: String? = "",
-    val company: String? = "",
-    val address: String? = "",
-    val createdAt: Date? = null,
-    val gender: String? = "male",
+    var id: Int? = null,
+    var firstName: String? = "",
+    var lastName: String? = "",
+    var email: String? = "",
+    var phone: String? = "",
+    var company: String? = "",
+    var address: String? = "",
+    var createdAt: Date? = null,
+    var gender: String? = "male",
     var isLongClicked: Boolean? = false,
     var birthday: Date? = null,
     var isFirstOfChar: Boolean? = false,
-    var keySearch: String? = null
+    var keySearch: String? = null,
+    var isChecked: Boolean? = false
 ) : Serializable {
     fun getBirthContact(): String? {
         return dateToString(this.birthday)
     }
 
-    fun setBirthContact(date:String?){
+    fun setBirthContact(date: String?) {
         this.birthday = stringToDate(date)
+    }
+
+    fun setGenderText(gender: String?) {
+        this.gender = if (gender == "Nam") "male" else "female"
+    }
+
+    fun getGenderText(): String {
+        return if (gender == "male") "Nam" else "Nữ"
+    }
+
+    fun getFullName(): String{
+        return "$firstName $lastName"
     }
 }

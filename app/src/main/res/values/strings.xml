@@ -42,4 +42,23 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="new_contact">Liên hệ mới</string>
+    <string name="edit_contact">Sửa liên hệ</string>
+    <string name="phone_hint">Số điện thoại</string>
+    <string name="first_name_hint">Tên</string>
+    <string name="last_name_hint">Họ</string>
+    <string name="email_hint">Email</string>
+    <string name="gender_hint">Giới tính</string>
+    <string name="birthday_hint">Ngày sinh</string>
+    <string name="address_hint">Địa chỉ</string>
+    <string name="company_hint">Công ty</string>
+    <string name="save_button">LƯU</string>
+    <string name="back_button">Quay lại</string>
+    <string name="avatar_image">Ảnh đại diện</string>
+    <string name="phone_required">Số điện thoại là bắt buộc</string>
+    <string name="invalid_phone">Số điện thoại không hợp lệ</string>
+    <string name="first_name_required">Tên là bắt buộc</string>
+    <string name="invalid_email">Email không hợp lệ</string>
+    <string name="invalid_date">Ngày sinh không hợp lệ</string>
+    <string name="validation_error">Vui lòng kiểm tra các trường nhập liệu</string>
 </resources>

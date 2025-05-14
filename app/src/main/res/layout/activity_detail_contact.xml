@@ -326,9 +326,9 @@
                         android:id="@+id/tv_birthday"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.address}"
-                        android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:text="@{contact.birthContact}"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
