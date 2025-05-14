@@ -6,17 +6,333 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chart"
-            android:textSize="26dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:text="Thống kê liên lạc"
+            android:textSize="@dimen/_13sdp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/bg_round_10bp"
+            android:backgroundTint="@color/e5e7eb"
+            android:orientation="horizontal"
+            android:padding="@dimen/_5sdp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="02/03/2025 00:00 AM - 02/03/2025 11:59 PM"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_10ssp" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/dropdown_btn"
+                android:layout_width="@dimen/_70sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:minHeight="@dimen/_20sdp"
+                android:padding="@dimen/_3sdp"
+                android:spinnerMode="dropdown"
+                android:text="Công ty"
+                android:textSize="@dimen/_10ssp" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_300sdp"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:background="@drawable/bg_round_10bp"
+            android:backgroundTint="@color/white"
+            android:elevation="@dimen/_5sdp">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_schedule"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_call"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_70sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:text="Cuộc gọi"
+                android:textSize="@dimen/_13sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginEnd="@dimen/_70sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:text="Lịch hẹn"
+                android:textSize="@dimen/_13sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Top 3 người liên lạc nhiều nhất"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:padding="16dp"
+            android:stretchColumns="*"
+            android:visibility="visible">
+
+            <TableRow>
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="Tên liên lạc"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="Số cuộc gọi"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="Tổng thời gian"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Bố"
+                    android:textColor="#4CAF50"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:textColor="#4CAF50"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="30s"
+                    android:textColor="#4CAF50"
+                    android:textSize="@dimen/_13ssp" />
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Mẹ"
+                    android:textColor="#FF9800"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="2"
+                    android:textColor="#FF9800"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="1m"
+                    android:textColor="#FF9800"
+                    android:textSize="@dimen/_13ssp" />
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Anh trai"
+                    android:textColor="#F44336"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="7"
+                    android:textColor="#F44336"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="3p30s"
+                    android:textColor="#F44336"
+                    android:textSize="@dimen/_13ssp" />
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:background="@color/black" />
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Tổng cộng"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="10"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_gravity="center"
+                    android:text="5m"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+            </TableRow>
+        </TableLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:padding="16dp"
+            android:stretchColumns="*"
+            android:visibility="gone">
+
+            <TableRow>
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="Tên liên lạc"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="Số lịch hẹn"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Bố"
+                    android:textColor="#4CAF50"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:textColor="#4CAF50"
+                    android:textSize="@dimen/_13ssp" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Mẹ"
+                    android:textColor="#FF9800"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="2"
+                    android:textColor="#FF9800"
+                    android:textSize="@dimen/_13ssp" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Anh trai"
+                    android:textColor="#F44336"
+                    android:textSize="@dimen/_13ssp" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="7"
+                    android:textColor="#F44336"
+                    android:textSize="@dimen/_13ssp" />
+
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:background="@color/black" />
+
+            <TableRow android:layout_marginTop="@dimen/_10sdp">
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="Tổng cộng"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:text="10"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
 </layout>
