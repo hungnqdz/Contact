@@ -4,7 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="contactBinding"
+            type="com.contact_app.contact.model.Contact" />
 
+        <variable
+            name="sizeNote"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,9 +33,10 @@
             app:srcCompat="@drawable/ic_back" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ghi chú của Huyen"
+            android:text="@{`Ghi chú của ` + contactBinding.fullName}"
             android:textColor="@color/primary"
             android:textSize="@dimen/_15sdp"
             app:layout_constraintBottom_toBottomOf="@id/btn_back"
@@ -42,6 +49,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
+            isVisible="@{sizeNote != 0}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -63,6 +71,19 @@
                 android:textColor="@color/primary"
                 android:textSize="@dimen/_15sdp" />
         </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_item"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_header"
+            tools:listitem="@layout/item_note" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_add"

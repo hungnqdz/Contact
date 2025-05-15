@@ -17,7 +17,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
 
     companion object {
         private const val DATABASE_NAME = "contact_database.db"
-        private const val DATABASE_VERSION = 2 // Incremented version due to schema change
+        private const val DATABASE_VERSION = 3
 
         // Table names
         private const val TABLE_CONTACT = "contact"
@@ -75,7 +75,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             """
         )
 
-        // Create Notes table
+        // Create Notes table with date_time
         db.execSQL(
             """
             CREATE TABLE $TABLE_NOTES (
@@ -84,6 +84,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 content TEXT,
                 comment TEXT,
                 contact_id INTEGER,
+                date_time INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
                 FOREIGN KEY (contact_id) REFERENCES $TABLE_CONTACT($COL_ID) ON DELETE CASCADE
             )
             """
@@ -102,7 +103,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             """
         )
 
-        // Create Schedule table with date_time
+        // Create Schedule table
         db.execSQL(
             """
             CREATE TABLE $TABLE_SCHEDULE (
@@ -132,7 +133,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 2) {
-            // Create a new table with date_time
             db.execSQL(
                 """
                 CREATE TABLE temp_schedule (
@@ -144,8 +144,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 )
                 """
             )
-
-            // Copy data from old schedule table, combining date and time
             db.execSQL(
                 """
                 INSERT INTO temp_schedule (id, title, content, type, date_time)
@@ -153,10 +151,17 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 FROM $TABLE_SCHEDULE
                 """
             )
-
-            // Drop old table and rename new one
             db.execSQL("DROP TABLE $TABLE_SCHEDULE")
             db.execSQL("ALTER TABLE temp_schedule RENAME TO $TABLE_SCHEDULE")
+        }
+
+        if (oldVersion < 3) {
+            db.execSQL(
+                """
+                ALTER TABLE $TABLE_NOTES
+                ADD COLUMN date_time INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+                """
+            )
         }
         initDatabase()
     }
@@ -175,24 +180,24 @@ class ContactDatabaseHelper private constructor(context: Context) :
         try {
             // Create sample birthdays
             val calendar = Calendar.getInstance()
-            calendar.set(1990, Calendar.JANUARY, 15)
+            calendar.set(1985, Calendar.FEBRUARY, 12)
             val birthday1 = calendar.time
-            calendar.set(1985, Calendar.MARCH, 22)
+            calendar.set(1990, Calendar.APRIL, 25)
             val birthday2 = calendar.time
-            calendar.set(1992, Calendar.JULY, 10)
+            calendar.set(1988, Calendar.AUGUST, 15)
             val birthday3 = calendar.time
-            calendar.set(1988, Calendar.NOVEMBER, 5)
+            calendar.set(1992, Calendar.DECEMBER, 3)
             val birthday4 = calendar.time
 
             // Insert sample Contacts
             val contact1Id = insertContact(
                 Contact(
-                    firstName = "Haha",
-                    lastName = "Funny",
-                    email = "haha@lol.com",
-                    phone = "1234567890",
-                    company = "Comedy Inc",
-                    address = "123 Laugh St",
+                    firstName = "James",
+                    lastName = "Wilson",
+                    email = "james.wilson@techcorp.com",
+                    phone = "2125550101",
+                    company = "TechCorp Solutions",
+                    address = "123 Park Avenue, New York, NY 10017",
                     createdAt = Date(),
                     gender = "Male",
                     birthday = birthday1
@@ -200,12 +205,12 @@ class ContactDatabaseHelper private constructor(context: Context) :
             )
             val contact2Id = insertContact(
                 Contact(
-                    firstName = "Hehe",
-                    lastName = "Joker",
-                    email = "hehe@giggle.com",
-                    phone = "0987654321",
-                    company = "Joke Ltd",
-                    address = "456 Chuckle Ave",
+                    firstName = "Sarah",
+                    lastName = "Johnson",
+                    email = "sarah.johnson@marketwise.com",
+                    phone = "3125550202",
+                    company = "MarketWise Analytics",
+                    address = "456 Michigan Ave, Chicago, IL 60611",
                     createdAt = Date(),
                     gender = "Female",
                     birthday = birthday2
@@ -213,25 +218,25 @@ class ContactDatabaseHelper private constructor(context: Context) :
             )
             val contact3Id = insertContact(
                 Contact(
-                    firstName = "chee",
-                    lastName = "Smiley",
-                    email = "teehee@smile.com",
-                    phone = "6677889900",
-                    company = "Smile LLC",
-                    address = "321 Grin Blvd",
+                    firstName = "Michael",
+                    lastName = "Chen",
+                    email = "michael.chen@innovatech.com",
+                    phone = "4155550303",
+                    company = "InnovaTech Systems",
+                    address = "789 Market St, San Francisco, CA 94103",
                     createdAt = Date(),
-                    gender = "Female",
+                    gender = "Male",
                     birthday = birthday3
                 )
             )
             val contact4Id = insertContact(
                 Contact(
-                    firstName = "Teehee",
-                    lastName = "Smiley",
-                    email = "teehee@smile.com",
-                    phone = "6677889900",
-                    company = "Smile LLC",
-                    address = "321 Grin Blvd",
+                    firstName = "Emily",
+                    lastName = "Davis",
+                    email = "emily.davis@globalconsult.com",
+                    phone = "6175550404",
+                    company = "GlobalConsult Partners",
+                    address = "321 Boylston St, Boston, MA 02116",
                     createdAt = Date(),
                     gender = "Female",
                     birthday = birthday4
@@ -239,14 +244,14 @@ class ContactDatabaseHelper private constructor(context: Context) :
             )
             val contact5Id = insertContact(
                 Contact(
-                    firstName = "Lol",
-                    lastName = "Chuckler",
-                    email = "lol@chuckle.com",
-                    phone = "5544332211",
-                    company = "Chuckle Co",
-                    address = "654 Tickle Ln",
+                    firstName = "Robert",
+                    lastName = "Martinez",
+                    email = "robert.martinez@fintechgroup.com",
+                    phone = "3055550505",
+                    company = "FinTech Group",
+                    address = "654 Brickell Ave, Miami, FL 33131",
                     createdAt = Date(),
-                    gender = null,
+                    gender = "Male",
                     birthday = null
                 )
             )
@@ -254,42 +259,47 @@ class ContactDatabaseHelper private constructor(context: Context) :
             // Insert sample Notes
             val note1Id = insertNote(
                 Note(
-                    title = "Hahaha Meeting",
-                    content = "Laughing plans",
-                    comment = "Super fun!",
-                    contactId = contact1Id.toInt()
+                    title = "Qvide Project Review",
+                    content = "Discussed project timeline and resource allocation",
+                    comment = "Follow up on resource allocation",
+                    contactId = contact1Id.toInt(),
+                    dateTime = Date()
                 )
             )
             val note2Id = insertNote(
                 Note(
-                    title = "Hahaha Party",
-                    content = "Giggle fest",
-                    comment = "LOL!",
-                    contactId = contact2Id.toInt()
+                    title = "Marketing Strategy Meeting",
+                    content = "Reviewed Q4 marketing campaigns",
+                    comment = "Need to finalize budget",
+                    contactId = contact2Id.toInt(),
+                    dateTime = Date()
                 )
             )
             val note3Id = insertNote(
                 Note(
-                    title = "Hehe Seminar",
-                    content = "Chuckle topics",
-                    comment = "Hilar!",
-                    contactId = contact3Id.toInt()
+                    title = "System Upgrade Discussion",
+                    content = "Evaluated new software implementation",
+                    comment = "Schedule vendor demo",
+                    contactId = contact3Id.toInt(),
+                    dateTime = Date()
                 )
             )
             val note4Id = insertNote(
                 Note(
-                    title = "Hoho Workshop",
-                    content = "Joke strategies",
-                    comment = "ROFL!",
-                    contactId = contact4Id.toInt()
+                    title = "Client Consultation",
+                    content = "Addressed client concerns about timeline",
+                    comment = "Positive feedback received",
+                    contactId = contact4Id.toInt(),
+                    dateTime = Date()
                 )
             )
             val note5Id = insertNote(
                 Note(
-                    title = "Teehee Rally",
-                    content = "Silly ideas",
-                    comment = "Whee!",
-                    contactId = contact5Id.toInt()
+                    title = "Financial Review",
+                    content = "Analyzed quarterly financial projections",
+                    comment = "Adjust projections for next quarter",
+                    contactId = contact5Id.toInt(),
+                    dateTime = Date()
                 )
             )
 
@@ -298,7 +308,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Hahaha Workshop",
+                    content = "Project Kickoff Meeting",
                     dateTime = eventCalendar.time,
                     noteId = note1Id.toInt()
                 )
@@ -306,7 +316,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Giggle Event",
+                    content = "Marketing Campaign Launch",
                     dateTime = eventCalendar.time,
                     noteId = note2Id.toInt()
                 )
@@ -314,7 +324,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Chuckle Fest",
+                    content = "Software Demo",
                     dateTime = eventCalendar.time,
                     noteId = note3Id.toInt()
                 )
@@ -322,7 +332,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Joke Jam",
+                    content = "Client Follow-up",
                     dateTime = eventCalendar.time,
                     noteId = note4Id.toInt()
                 )
@@ -330,7 +340,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Silly Symposium",
+                    content = "Financial Planning Session",
                     dateTime = eventCalendar.time,
                     noteId = note5Id.toInt()
                 )
@@ -338,7 +348,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "LOL Lecture",
+                    content = "Team Sync",
                     dateTime = eventCalendar.time,
                     noteId = note1Id.toInt()
                 )
@@ -346,7 +356,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Hehe Hangout",
+                    content = "Budget Review",
                     dateTime = eventCalendar.time,
                     noteId = note2Id.toInt()
                 )
@@ -354,7 +364,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             insertEvent(
                 Event(
-                    content = "Hoho Huddle",
+                    content = "Vendor Negotiation",
                     dateTime = eventCalendar.time,
                     noteId = note3Id.toInt()
                 )
@@ -364,8 +374,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule1Id = insertSchedule(
                 Schedule(
-                    title = "Hahaha Conference",
-                    content = "Annual comedy conference",
+                    title = "Annual Strategy Conference",
+                    content = "Discuss company goals and objectives",
                     type = "online",
                     dateTime = eventCalendar.time
                 )
@@ -373,8 +383,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule2Id = insertSchedule(
                 Schedule(
-                    title = "LOL Meetup",
-                    content = "Local comedian meetup",
+                    title = "Regional Team Meeting",
+                    content = "Review regional performance metrics",
                     type = "offline",
                     dateTime = eventCalendar.time
                 )
@@ -382,8 +392,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule3Id = insertSchedule(
                 Schedule(
-                    title = "Hehe Briefing",
-                    content = "Comedy workshop briefing",
+                    title = "Product Development Briefing",
+                    content = "Update on new product features",
                     type = "online",
                     dateTime = eventCalendar.time
                 )
@@ -391,8 +401,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule4Id = insertSchedule(
                 Schedule(
-                    title = "Hoho Forum",
-                    content = "Joke writing forum",
+                    title = "Client Portfolio Review",
+                    content = "Evaluate client investment strategies",
                     type = "offline",
                     dateTime = eventCalendar.time
                 )
@@ -400,8 +410,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule5Id = insertSchedule(
                 Schedule(
-                    title = "Teehee Summit",
-                    content = "Comedy summit",
+                    title = "Technology Summit",
+                    content = "Explore emerging tech trends",
                     type = "online",
                     dateTime = eventCalendar.time
                 )
@@ -409,8 +419,8 @@ class ContactDatabaseHelper private constructor(context: Context) :
             eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
             val schedule6Id = insertSchedule(
                 Schedule(
-                    title = "Chuckle Conclave",
-                    content = "Improv comedy conclave",
+                    title = "Leadership Workshop",
+                    content = "Develop leadership skills",
                     type = "offline",
                     dateTime = eventCalendar.time
                 )
@@ -419,21 +429,21 @@ class ContactDatabaseHelper private constructor(context: Context) :
             // Insert sample ScheduleContacts
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Haha Funny",
+                    contactName = "James Wilson",
                     scheduleId = schedule1Id.toInt(),
                     contactId = contact1Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Hehe Joker",
+                    contactName = "Sarah Johnson",
                     scheduleId = schedule2Id.toInt(),
                     contactId = contact2Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Hoho Giggles",
+                    contactName = "Michael Chen",
                     scheduleId = schedule3Id.toInt(),
                     contactId = contact3Id.toInt()
                 )
@@ -442,47 +452,47 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 ScheduleContact(
                     scheduleId = schedule4Id.toInt(),
                     contactId = contact4Id.toInt(),
-                    contactName = "Teehee Smiley"
+                    contactName = "Emily Davis"
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Lol Chuckler",
+                    contactName = "Robert Martinez",
                     scheduleId = schedule5Id.toInt(),
                     contactId = contact5Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Haha Funny",
+                    contactName = "James Wilson",
                     scheduleId = schedule6Id.toInt(),
                     contactId = contact1Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Hehe Joker",
+                    contactName = "Sarah Johnson",
                     scheduleId = schedule1Id.toInt(),
                     contactId = contact2Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Hoho Giggles",
+                    contactName = "Michael Chen",
                     scheduleId = schedule2Id.toInt(),
                     contactId = contact3Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Teehee Smiley",
+                    contactName = "Emily Davis",
                     scheduleId = schedule3Id.toInt(),
                     contactId = contact4Id.toInt()
                 )
             )
             insertScheduleContact(
                 ScheduleContact(
-                    contactName = "Lol Chuckler",
+                    contactName = "Robert Martinez",
                     scheduleId = schedule4Id.toInt(),
                     contactId = contact5Id.toInt()
                 )
@@ -715,8 +725,111 @@ class ContactDatabaseHelper private constructor(context: Context) :
             put("content", note.content)
             put("comment", note.comment)
             put("contact_id", note.contactId)
+            put("date_time", note.dateTime?.time ?: System.currentTimeMillis())
         }
         return db.insert(TABLE_NOTES, null, values)
+    }
+
+    fun getAllNotes(): List<Note> {
+        val notes = mutableListOf<Note>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NOTES,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "date_time DESC"
+        )
+
+        while (cursor.moveToNext()) {
+            notes.add(
+                Note(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    comment = cursor.getString(cursor.getColumnIndexOrThrow("comment")),
+                    contactId = cursor.getInt(cursor.getColumnIndexOrThrow("contact_id")),
+                    dateTime = Date(cursor.getLong(cursor.getColumnIndexOrThrow("date_time")))
+                )
+            )
+        }
+        cursor.close()
+        return notes
+    }
+
+    fun getNoteById(id: Int): Note? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NOTES,
+            null,
+            "$COL_ID = ?",
+            arrayOf(id.toString()),
+            null,
+            null,
+            null
+        )
+
+        var note: Note? = null
+        if (cursor.moveToFirst()) {
+            note = Note(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                comment = cursor.getString(cursor.getColumnIndexOrThrow("comment")),
+                contactId = cursor.getInt(cursor.getColumnIndexOrThrow("contact_id")),
+                dateTime = Date(cursor.getLong(cursor.getColumnIndexOrThrow("date_time")))
+            )
+        }
+        cursor.close()
+        return note
+    }
+
+    fun updateNote(note: Note): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("title", note.title)
+            put("content", note.content)
+            put("comment", note.comment)
+            put("contact_id", note.contactId)
+            put("date_time", note.dateTime?.time ?: System.currentTimeMillis())
+        }
+        return db.update(TABLE_NOTES, values, "$COL_ID = ?", arrayOf(note.id.toString()))
+    }
+
+    fun deleteNote(id: Int): Int {
+        val db = writableDatabase
+        return db.delete(TABLE_NOTES, "$COL_ID = ?", arrayOf(id.toString()))
+    }
+
+    fun getNoteByContactId(contactId: Int): List<Note> {
+        val notes = mutableListOf<Note>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NOTES,
+            null,
+            "contact_id = ?",
+            arrayOf(contactId.toString()),
+            null,
+            null,
+            "date_time DESC"
+        )
+
+        while (cursor.moveToNext()) {
+            notes.add(
+                Note(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    comment = cursor.getString(cursor.getColumnIndexOrThrow("comment")),
+                    contactId = cursor.getInt(cursor.getColumnIndexOrThrow("contact_id")),
+                    dateTime = Date(cursor.getLong(cursor.getColumnIndexOrThrow("date_time")))
+                )
+            )
+        }
+        cursor.close()
+        return notes
     }
 
     // Event CRUD operations
@@ -859,18 +972,16 @@ class ContactDatabaseHelper private constructor(context: Context) :
         return contacts
     }
 
-    fun updateScheduleContact(scheduleId: Int, newContacts: List<Contact>, isNew:Boolean? = false) {
+    fun updateScheduleContact(scheduleId: Int, newContacts: List<Contact>, isNew: Boolean? = false) {
         val db = writableDatabase
         db.beginTransaction()
         try {
-            // Xóa các liên kết contact cũ khỏi schedule
             if (isNew == false) db.delete(
                 TABLE_SCHEDULE_CONTACT,
                 "schedule_id = ?",
                 arrayOf(scheduleId.toString())
             )
 
-            // Thêm lại các contact mới từ danh sách Contact
             val values = ContentValues()
             for (contact in newContacts) {
                 values.clear()
@@ -915,5 +1026,4 @@ class ContactDatabaseHelper private constructor(context: Context) :
         val db = writableDatabase
         return db.delete(TABLE_SCHEDULE, "$COL_ID = ?", arrayOf(id.toString()))
     }
-
 }

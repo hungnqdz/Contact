@@ -83,7 +83,10 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                         contactLabel.visibility = View.VISIBLE
                         return
                     }
-                    listContacts = dbHelper.search(p0.toString(), searchColumn?.column ?: "name") as MutableList
+                    listContacts = dbHelper.search(
+                        p0.toString(),
+                        searchColumn?.column ?: "name"
+                    ) as MutableList
                     listContacts.map {
                         it.keySearch = p0.toString()
                     }
@@ -95,7 +98,7 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
             })
             val spinnerAdapter = SearchSpinnerAdapter(
                 requireContext(), R.layout.item_spinner,
-                listOf("Tên", "Công ty", "Số điện thoại","Email")
+                listOf("Tên", "Công ty", "Số điện thoại", "Email")
             )
             dropdownBtn.adapter = spinnerAdapter
             dropdownBtn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -150,9 +153,10 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                         R.id.private_storage -> {
                             true
                         }
+
                         R.id.add_contact -> {
-                            val intent = Intent(requireContext(),FormContactActivity::class.java)
-                            startActivityForResult(intent,3)
+                            val intent = Intent(requireContext(), FormContactActivity::class.java)
+                            startActivityForResult(intent, 3)
                             true
                         }
 
@@ -185,17 +189,17 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
 
     override fun onItemClicked(item: Contact) {
         super.onItemClicked(item)
-        val intent = Intent(requireContext(),DetailContactActivity::class.java)
-        intent.putExtra("contact",item)
-        startActivityForResult(intent,2)
+        val intent = Intent(requireContext(), DetailContactActivity::class.java)
+        intent.putExtra("contact", item)
+        startActivityForResult(intent, 2)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == 2 || requestCode == 3) && resultCode == RESULT_OK) {
-            val result = data?.getBooleanExtra("isUpdate",false)
-            val resultCreate = data?.getBooleanExtra("isCreate",false)
-            if (result == true || resultCreate == true){
+            val result = data?.getBooleanExtra("isUpdate", false)
+            val resultCreate = data?.getBooleanExtra("isCreate", false)
+            if (result == true || resultCreate == true) {
                 adapter.submitList(dbHelper.getAllContacts())
                 viewBinding.numberContact = dbHelper.countContacts()
             }

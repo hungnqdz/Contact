@@ -141,7 +141,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/btn_schedule"
+                        android:id="@+id/btn_delete"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -155,13 +155,13 @@
                             android:backgroundTint="@color/primary"
                             android:padding="@dimen/_10sdp"
                             android:tint="@color/white"
-                            app:srcCompat="@drawable/ic_schedule" />
+                            app:srcCompat="@drawable/ic_delete" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/_5sdp"
-                            android:text="Lên lịch hẹn"
+                            android:text="Xoá liên hệ"
                             android:textColor="@color/black"
                             android:textSize="@dimen/_10sdp" />
                     </LinearLayout>
@@ -378,6 +378,7 @@
                     android:background="#D4D4D4" />
 
                 <LinearLayout
+                    android:id="@+id/btn_note"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/_10sdp"
