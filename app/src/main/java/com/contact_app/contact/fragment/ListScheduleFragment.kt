@@ -74,10 +74,10 @@ class ListScheduleFragment : Fragment(), OnItemClickListener<Schedule> {
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
-                    if (!p0.isNullOrBlank()) this@ListScheduleFragment.adapter.submitList(
-                        dbHelper.searchSchedules(
+                    this@ListScheduleFragment.adapter.submitList(
+                        if (!p0.isNullOrBlank()) dbHelper.searchSchedules(
                             p0.toString().trim()
-                        )
+                        ) else dbHelper.getAllSchedules()
                     )
                 }
             })
