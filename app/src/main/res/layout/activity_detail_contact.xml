@@ -257,6 +257,7 @@
                         android:text="@{contact.email}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
+                        android:hint="email"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
@@ -279,6 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@{contact.company}"
+                        android:hint="Công ty"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
                         android:textColor="@color/black"
@@ -305,6 +307,7 @@
                         android:text="@{contact.address}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
+                        android:hint="Địa chỉ"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
@@ -329,6 +332,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:text="@{contact.birthContact}"
+                        android:hint="Ngày sinh"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>

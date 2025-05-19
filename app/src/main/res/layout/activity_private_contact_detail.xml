@@ -259,6 +259,8 @@
                         android:text="@{contactPrivate.email}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
+                        android:hint="email"
+                        android:textColorHint="@color/white"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
@@ -282,6 +284,8 @@
                         android:layout_height="wrap_content"
                         android:text="@{contactPrivate.company}"
                         android:layout_marginStart="@dimen/_10sdp"
+                        android:hint="Công ty"
+                        android:textColorHint="@color/white"
                         android:layout_gravity="center_vertical"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
@@ -304,10 +308,12 @@
                         android:id="@+id/tv_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contactPrivate.address}"
-                        android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:text="@{contactPrivate.address}"
                         android:textColor="@color/white"
+                        android:hint="Địa chỉ"
+                        android:textColorHint="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -329,6 +335,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:textColorHint="@color/white"
+                        android:hint="Ngày sinh"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:text="@{contactPrivate.birthContact}"
                         android:textColor="@color/white"

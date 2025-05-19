@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.contact_app.contact.MainActivity
 import com.contact_app.contact.R
 import com.contact_app.contact.adapter.CustomSpinnerAdapter
+import com.contact_app.contact.base.Colors
 import com.contact_app.contact.base.getTimeRangeLabel
 import com.contact_app.contact.databinding.FragmentChartBinding
 import com.contact_app.contact.db.ContactDatabaseHelper
@@ -49,7 +50,6 @@ class ChartFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
         dbHelper = activity.dbHelper
-        dbHelper.syncContactsFromDevice()
         dbHelper.syncCallLogsFromDevice()
         viewBinding.apply {
             // Set up spinner
@@ -125,10 +125,12 @@ class ChartFragment : Fragment() {
     private fun updatePieChart(entries: List<PieEntry>) {
         val filteredEntries = entries.filter { it.value.toInt() != 0 }
         val pieDataSet = PieDataSet(filteredEntries, "")
-        pieDataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
+        pieDataSet.setColors(*Colors.CUSTOM_COLORS)
         viewBinding.pieChart.data = PieData(pieDataSet)
         pieDataSet.valueTextSize = 12f
         viewBinding.pieChart.animateY(1000)
+        viewBinding.pieChart.setEntryLabelColor(R.color.black)
+        viewBinding.pieChart.legend.isWordWrapEnabled = true
         viewBinding.pieChart.invalidate()
     }
 
