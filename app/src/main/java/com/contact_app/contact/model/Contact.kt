@@ -31,15 +31,7 @@ data class Contact(
         this.birthday = stringToDate(date)
     }
 
-    fun setGenderText(gender: String?) {
-        this.gender = if (gender == "Nam") "male" else "female"
-    }
-
-    fun getGenderText(): String {
-        return if (gender == "male") "Nam" else "Nữ"
-    }
-
     fun getFullName(): String{
-        return "$firstName $lastName"
+        return "$firstName $lastName".trim()
     }
 }

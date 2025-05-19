@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <queries>
         <intent>
             <action android:name="android.intent.action.SENDTO" />
@@ -50,8 +52,40 @@
         <activity
             android:name=".FormContactActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".AskPasswordActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SetPasswordActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateContact"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateDetailContact"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateFormContact"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateAddNote"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateAddEvent"
+            android:exported="false" />
         <activity
             android:name=".ChooseContactActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityPrivateNote"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

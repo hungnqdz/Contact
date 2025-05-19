@@ -5,7 +5,7 @@
 
     <data>
         <variable
-            name="contact"
+            name="contactPrivate"
             type="com.contact_app.contact.model.Contact" />
     </data>
 
@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:orientation="vertical"
+        android:backgroundTint="@color/black"
         tools:context=".DetailContactActivity">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -24,6 +25,7 @@
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:padding="@dimen/_5sdp"
+            android:tint="@color/white"
             app:srcCompat="@drawable/ic_back" />
 
         <androidx.core.widget.NestedScrollView
@@ -50,8 +52,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:text="@{contact.firstName + ` ` + contact.lastName}"
-                    android:textColor="@color/black"
+                    android:text="@{contactPrivate.firstName + ` ` + contactPrivate.lastName}"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/_20ssp" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -59,8 +61,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="@{contact.phone}"
-                    android:textColor="@color/black"
+                    android:text="@{contactPrivate.phone}"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/_13ssp" />
 
                 <View
@@ -77,7 +79,7 @@
                     android:layout_marginTop="@dimen/_15sdp"
                     android:layout_marginBottom="@dimen/_5sdp"
                     android:background="@drawable/border_black"
-                    android:backgroundTint="@color/white"
+                    android:backgroundTint="@color/black"
                     android:gravity="center"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -108,7 +110,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:text="Gọi"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/_10sdp" />
 
                     </LinearLayout>
@@ -135,7 +137,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:text="Sửa"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/_10sdp" />
 
                     </LinearLayout>
@@ -162,7 +164,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:text="Xoá liên hệ"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/_10sdp" />
                     </LinearLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -183,10 +185,10 @@
                         android:id="@+id/tv_user_name_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.firstName + ` ` + contact.lastName}"
+                        android:text="@{contactPrivate.firstName + ` ` + contactPrivate.lastName}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -206,10 +208,10 @@
                         android:id="@+id/tv_gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.gender}"
+                        android:text="@{contactPrivate.gender}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -230,10 +232,10 @@
                         android:id="@+id/tv_number_phone_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.phone}"
+                        android:text="@{contactPrivate.phone}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -254,10 +256,10 @@
                         android:id="@+id/tv_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.email}"
+                        android:text="@{contactPrivate.email}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -278,10 +280,10 @@
                         android:id="@+id/tv_company"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.company}"
+                        android:text="@{contactPrivate.company}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -302,10 +304,10 @@
                         android:id="@+id/tv_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{contact.address}"
+                        android:text="@{contactPrivate.address}"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -328,8 +330,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/_10sdp"
-                        android:text="@{contact.birthContact}"
-                        android:textColor="@color/black"
+                        android:text="@{contactPrivate.birthContact}"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_13sdp" />
                 </LinearLayout>
 
@@ -366,10 +368,10 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Thêm vào vùng lưu trữ an toàn"
+                        android:text="Xuất khỏi vùng lưu trữ an toàn"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_10sdp" />
                 </LinearLayout>
 
@@ -398,7 +400,7 @@
                         android:text="Ghi chú"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_10sdp" />
                 </LinearLayout>
 
@@ -427,7 +429,7 @@
                         android:text="Gửi email"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_gravity="center_vertical"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/_10sdp" />
                 </LinearLayout>
 

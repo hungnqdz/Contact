@@ -1,20 +1,22 @@
 package com.contact_app.contact
 
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import com.contact_app.contact.base.BaseActivity
 import com.contact_app.contact.databinding.ActivityAddEventBinding
+import com.contact_app.contact.databinding.ActivityPrivateAddEventBinding
 import com.contact_app.contact.model.Event
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class AddEventActivity : BaseActivity<ActivityAddEventBinding>() {
+class ActivityPrivateAddEvent : BaseActivity<ActivityPrivateAddEventBinding>() {
     override val layoutId: Int
-        get() = R.layout.activity_add_event
+        get() = R.layout.activity_private_add_event
 
     private val calendar = Calendar.getInstance()
     private var selectedDate: String = ""
@@ -23,15 +25,16 @@ class AddEventActivity : BaseActivity<ActivityAddEventBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        window.statusBarColor = Color.BLACK
+        window.decorView.systemUiVisibility = 0
         event = intent.getSerializableExtra("event") as? Event ?: Event()
         isEditMode = event.id != null
 
         viewBinding.apply {
-            event = this@AddEventActivity.event
+            event = this@ActivityPrivateAddEvent.event
             Log.d("event","${event?.getDate()}")
             if (isEditMode) {
-                selectedDate = this@AddEventActivity.event.getDate() ?: ""
+                selectedDate = this@ActivityPrivateAddEvent.event.getDate() ?: ""
 
                 try {
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -81,21 +84,21 @@ class AddEventActivity : BaseActivity<ActivityAddEventBinding>() {
             val content = tvContent.text.toString().trim()
 
             if (selectedDate.isEmpty() || title.isEmpty() || content.isEmpty()) {
-                Toast.makeText(this@AddEventActivity, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT)
+                Toast.makeText(this@ActivityPrivateAddEvent, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT)
                     .show()
                 return
             }
 
             if (isEditMode) {
-                this@AddEventActivity.event.title = title
-                this@AddEventActivity.event.content = content
-                this@AddEventActivity.event.setDate(selectedDate)
+                this@ActivityPrivateAddEvent.event.title = title
+                this@ActivityPrivateAddEvent.event.content = content
+                this@ActivityPrivateAddEvent.event.setDate(selectedDate)
             } else {
-                this@AddEventActivity.event = Event(title = title, content = content)
-                this@AddEventActivity.event.setDate(selectedDate)
+                this@ActivityPrivateAddEvent.event = Event(title = title, content = content)
+                this@ActivityPrivateAddEvent.event.setDate(selectedDate)
             }
 
-            finishActivityWithResult("event", this@AddEventActivity.event)
+            finishActivityWithResult("event", this@ActivityPrivateAddEvent.event)
         }
     }
 

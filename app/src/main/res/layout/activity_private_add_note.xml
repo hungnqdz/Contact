@@ -13,7 +13,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/black">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_back"
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tiêu đề"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_13ssp" />
 
             <androidx.appcompat.widget.AppCompatEditText
@@ -78,8 +78,9 @@
                 android:text="@{noteBinding.title}"
                 android:padding="@dimen/_7sdp"
                 android:inputType="text"
-                android:textColor="@color/black"
-                android:textColorHint="@color/_71717a"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:backgroundTint="#1E1E1E"
                 android:textSize="@dimen/_12ssp" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -87,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="Nội dung"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_13ssp" />
 
             <androidx.appcompat.widget.AppCompatEditText
@@ -100,8 +101,9 @@
                 android:text="@{noteBinding.content}"
                 android:padding="@dimen/_7sdp"
                 android:inputType="text"
-                android:textColor="@color/black"
-                android:textColorHint="@color/_71717a"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:backgroundTint="#1E1E1E"
                 android:textSize="@dimen/_12ssp" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -109,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:text="Bình luận"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_13ssp" />
 
             <androidx.appcompat.widget.AppCompatEditText
@@ -122,8 +124,9 @@
                 android:padding="@dimen/_7sdp"
                 android:text="@{noteBinding.comment}"
                 android:inputType="text"
-                android:textColor="@color/black"
-                android:textColorHint="@color/_71717a"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:backgroundTint="#1E1E1E"
                 android:textSize="@dimen/_12ssp" />
 
             <View
@@ -151,21 +154,21 @@
                     android:text="Thêm sự kiện"
                     android:layout_marginStart="@dimen/_10sdp"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/_10sdp" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/_71717a" />
+                android:layout_height="1dp"
+                android:background="@color/white" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sự kiện đã thêm"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_13ssp" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -175,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_event" />
+                tools:listitem="@layout/item_private_event" />
 
 
         </LinearLayout>

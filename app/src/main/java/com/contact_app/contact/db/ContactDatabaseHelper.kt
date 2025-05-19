@@ -1,35 +1,45 @@
 package com.contact_app.contact.db
 
+import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.provider.ContactsContract
+import android.provider.CallLog
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import android.widget.Toast
+import com.contact_app.contact.model.CallLogStats
 import com.contact_app.contact.model.Contact
 import com.contact_app.contact.model.Event
 import com.contact_app.contact.model.Note
 import com.contact_app.contact.model.Schedule
 import com.contact_app.contact.model.ScheduleContact
+import com.contact_app.contact.model.ScheduleStats
+import com.contact_app.contact.model.TimeRange
 import java.util.Calendar
 import java.util.Date
 
-class ContactDatabaseHelper private constructor(context: Context) :
+class ContactDatabaseHelper private constructor(private val context: Context, private val askingPermission: () -> Unit? = {}) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "contact_database.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 6
 
-        // Table names
         private const val TABLE_CONTACT = "contact"
         private const val TABLE_NOTES = "notes"
         private const val TABLE_EVENTS = "events"
         private const val TABLE_SCHEDULE = "schedule"
         private const val TABLE_SCHEDULE_CONTACT = "schedule_contact"
+        private const val TABLE_CALL_LOG = "call_log"
 
-        // Common column names
         private const val COL_ID = "id"
 
-        // Valid columns for sorting
         private val VALID_CONTACT_COLUMNS = setOf(
             "id",
             "first_name",
@@ -46,22 +56,20 @@ class ContactDatabaseHelper private constructor(context: Context) :
         @Volatile
         private var instance: ContactDatabaseHelper? = null
 
-        fun getInstance(context: Context): ContactDatabaseHelper {
+        fun getInstance(context: Context, askingPermission: () -> Unit): ContactDatabaseHelper {
             return instance ?: synchronized(this) {
-                instance ?: ContactDatabaseHelper(context.applicationContext).also {
+                instance ?: ContactDatabaseHelper(context.applicationContext, askingPermission).also {
                     instance = it
-                    it.initDatabase()
                 }
             }
         }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Create Contact table
         db.execSQL(
             """
             CREATE TABLE $TABLE_CONTACT (
-                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_ID INTEGER PRIMARY KEY,
                 first_name TEXT NOT NULL,
                 last_name TEXT,
                 email TEXT,
@@ -70,12 +78,11 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 address TEXT,
                 created_at INTEGER,
                 gender TEXT NOT NULL,
-                birthday INTEGER NOT NULL
+                birthday INTEGER
             )
             """
         )
 
-        // Create Notes table with date_time
         db.execSQL(
             """
             CREATE TABLE $TABLE_NOTES (
@@ -90,11 +97,11 @@ class ContactDatabaseHelper private constructor(context: Context) :
             """
         )
 
-        // Create Events table
         db.execSQL(
             """
             CREATE TABLE $TABLE_EVENTS (
                 $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT,
                 content TEXT,
                 date_time INTEGER,
                 id_note INTEGER,
@@ -103,7 +110,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
             """
         )
 
-        // Create Schedule table
         db.execSQL(
             """
             CREATE TABLE $TABLE_SCHEDULE (
@@ -116,7 +122,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
             """
         )
 
-        // Create ScheduleContact table
         db.execSQL(
             """
             CREATE TABLE $TABLE_SCHEDULE_CONTACT (
@@ -129,384 +134,369 @@ class ContactDatabaseHelper private constructor(context: Context) :
             )
             """
         )
+
+        db.execSQL(
+            """
+            CREATE TABLE $TABLE_CALL_LOG (
+                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                phone TEXT NOT NULL,
+                call_type TEXT CHECK(call_type IN ('INCOMING', 'OUTGOING', 'MISSED')) NOT NULL,
+                duration INTEGER,
+                call_time INTEGER NOT NULL,
+                contact_id INTEGER,
+                FOREIGN KEY (contact_id) REFERENCES $TABLE_CONTACT($COL_ID) ON DELETE CASCADE
+            )
+            """
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 2) {
-            db.execSQL(
-                """
-                CREATE TABLE temp_schedule (
-                    $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    content TEXT,
-                    type TEXT CHECK(type IN ('online', 'offline')) NOT NULL,
-                    date_time INTEGER NOT NULL
-                )
-                """
-            )
-            db.execSQL(
-                """
-                INSERT INTO temp_schedule (id, title, content, type, date_time)
-                SELECT id, title, content, type, date AS date_time
-                FROM $TABLE_SCHEDULE
-                """
-            )
-            db.execSQL("DROP TABLE $TABLE_SCHEDULE")
-            db.execSQL("ALTER TABLE temp_schedule RENAME TO $TABLE_SCHEDULE")
-        }
-
-        if (oldVersion < 3) {
-            db.execSQL(
-                """
-                ALTER TABLE $TABLE_NOTES
-                ADD COLUMN date_time INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
-                """
-            )
-        }
-        initDatabase()
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CALL_LOG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SCHEDULE_CONTACT")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SCHEDULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_EVENTS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NOTES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACT")
+        onCreate(db)
+        // Không gọi initDatabase() ở đây để tránh đệ quy
     }
 
-    fun initDatabase() {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_CONTACT", null)
-        cursor.moveToFirst()
-        val count = cursor.getInt(0)
-        cursor.close()
-
-        if (count > 0) return
-
-        val writeDb = writableDatabase
-        writeDb.beginTransaction()
-        try {
-            // Create sample birthdays
-            val calendar = Calendar.getInstance()
-            calendar.set(1985, Calendar.FEBRUARY, 12)
-            val birthday1 = calendar.time
-            calendar.set(1990, Calendar.APRIL, 25)
-            val birthday2 = calendar.time
-            calendar.set(1988, Calendar.AUGUST, 15)
-            val birthday3 = calendar.time
-            calendar.set(1992, Calendar.DECEMBER, 3)
-            val birthday4 = calendar.time
-
-            // Insert sample Contacts
-            val contact1Id = insertContact(
-                Contact(
-                    firstName = "James",
-                    lastName = "Wilson",
-                    email = "james.wilson@techcorp.com",
-                    phone = "2125550101",
-                    company = "TechCorp Solutions",
-                    address = "123 Park Avenue, New York, NY 10017",
-                    createdAt = Date(),
-                    gender = "Male",
-                    birthday = birthday1
-                )
-            )
-            val contact2Id = insertContact(
-                Contact(
-                    firstName = "Sarah",
-                    lastName = "Johnson",
-                    email = "sarah.johnson@marketwise.com",
-                    phone = "3125550202",
-                    company = "MarketWise Analytics",
-                    address = "456 Michigan Ave, Chicago, IL 60611",
-                    createdAt = Date(),
-                    gender = "Female",
-                    birthday = birthday2
-                )
-            )
-            val contact3Id = insertContact(
-                Contact(
-                    firstName = "Michael",
-                    lastName = "Chen",
-                    email = "michael.chen@innovatech.com",
-                    phone = "4155550303",
-                    company = "InnovaTech Systems",
-                    address = "789 Market St, San Francisco, CA 94103",
-                    createdAt = Date(),
-                    gender = "Male",
-                    birthday = birthday3
-                )
-            )
-            val contact4Id = insertContact(
-                Contact(
-                    firstName = "Emily",
-                    lastName = "Davis",
-                    email = "emily.davis@globalconsult.com",
-                    phone = "6175550404",
-                    company = "GlobalConsult Partners",
-                    address = "321 Boylston St, Boston, MA 02116",
-                    createdAt = Date(),
-                    gender = "Female",
-                    birthday = birthday4
-                )
-            )
-            val contact5Id = insertContact(
-                Contact(
-                    firstName = "Robert",
-                    lastName = "Martinez",
-                    email = "robert.martinez@fintechgroup.com",
-                    phone = "3055550505",
-                    company = "FinTech Group",
-                    address = "654 Brickell Ave, Miami, FL 33131",
-                    createdAt = Date(),
-                    gender = "Male",
-                    birthday = null
-                )
-            )
-
-            // Insert sample Notes
-            val note1Id = insertNote(
-                Note(
-                    title = "Qvide Project Review",
-                    content = "Discussed project timeline and resource allocation",
-                    comment = "Follow up on resource allocation",
-                    contactId = contact1Id.toInt(),
-                    dateTime = Date()
-                )
-            )
-            val note2Id = insertNote(
-                Note(
-                    title = "Marketing Strategy Meeting",
-                    content = "Reviewed Q4 marketing campaigns",
-                    comment = "Need to finalize budget",
-                    contactId = contact2Id.toInt(),
-                    dateTime = Date()
-                )
-            )
-            val note3Id = insertNote(
-                Note(
-                    title = "System Upgrade Discussion",
-                    content = "Evaluated new software implementation",
-                    comment = "Schedule vendor demo",
-                    contactId = contact3Id.toInt(),
-                    dateTime = Date()
-                )
-            )
-            val note4Id = insertNote(
-                Note(
-                    title = "Client Consultation",
-                    content = "Addressed client concerns about timeline",
-                    comment = "Positive feedback received",
-                    contactId = contact4Id.toInt(),
-                    dateTime = Date()
-                )
-            )
-            val note5Id = insertNote(
-                Note(
-                    title = "Financial Review",
-                    content = "Analyzed quarterly financial projections",
-                    comment = "Adjust projections for next quarter",
-                    contactId = contact5Id.toInt(),
-                    dateTime = Date()
-                )
-            )
-
-            // Insert sample Events
-            val eventCalendar = Calendar.getInstance()
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Project Kickoff Meeting",
-                    dateTime = eventCalendar.time,
-                    noteId = note1Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Marketing Campaign Launch",
-                    dateTime = eventCalendar.time,
-                    noteId = note2Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Software Demo",
-                    dateTime = eventCalendar.time,
-                    noteId = note3Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Client Follow-up",
-                    dateTime = eventCalendar.time,
-                    noteId = note4Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Financial Planning Session",
-                    dateTime = eventCalendar.time,
-                    noteId = note5Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Team Sync",
-                    dateTime = eventCalendar.time,
-                    noteId = note1Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Budget Review",
-                    dateTime = eventCalendar.time,
-                    noteId = note2Id.toInt()
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            insertEvent(
-                Event(
-                    content = "Vendor Negotiation",
-                    dateTime = eventCalendar.time,
-                    noteId = note3Id.toInt()
-                )
-            )
-
-            // Insert sample Schedules
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule1Id = insertSchedule(
-                Schedule(
-                    title = "Annual Strategy Conference",
-                    content = "Discuss company goals and objectives",
-                    type = "online",
-                    dateTime = eventCalendar.time
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule2Id = insertSchedule(
-                Schedule(
-                    title = "Regional Team Meeting",
-                    content = "Review regional performance metrics",
-                    type = "offline",
-                    dateTime = eventCalendar.time
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule3Id = insertSchedule(
-                Schedule(
-                    title = "Product Development Briefing",
-                    content = "Update on new product features",
-                    type = "online",
-                    dateTime = eventCalendar.time
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule4Id = insertSchedule(
-                Schedule(
-                    title = "Client Portfolio Review",
-                    content = "Evaluate client investment strategies",
-                    type = "offline",
-                    dateTime = eventCalendar.time
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule5Id = insertSchedule(
-                Schedule(
-                    title = "Technology Summit",
-                    content = "Explore emerging tech trends",
-                    type = "online",
-                    dateTime = eventCalendar.time
-                )
-            )
-            eventCalendar.add(Calendar.DAY_OF_MONTH, 1)
-            val schedule6Id = insertSchedule(
-                Schedule(
-                    title = "Leadership Workshop",
-                    content = "Develop leadership skills",
-                    type = "offline",
-                    dateTime = eventCalendar.time
-                )
-            )
-
-            // Insert sample ScheduleContacts
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "James Wilson",
-                    scheduleId = schedule1Id.toInt(),
-                    contactId = contact1Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Sarah Johnson",
-                    scheduleId = schedule2Id.toInt(),
-                    contactId = contact2Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Michael Chen",
-                    scheduleId = schedule3Id.toInt(),
-                    contactId = contact3Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    scheduleId = schedule4Id.toInt(),
-                    contactId = contact4Id.toInt(),
-                    contactName = "Emily Davis"
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Robert Martinez",
-                    scheduleId = schedule5Id.toInt(),
-                    contactId = contact5Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "James Wilson",
-                    scheduleId = schedule6Id.toInt(),
-                    contactId = contact1Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Sarah Johnson",
-                    scheduleId = schedule1Id.toInt(),
-                    contactId = contact2Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Michael Chen",
-                    scheduleId = schedule2Id.toInt(),
-                    contactId = contact3Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Emily Davis",
-                    scheduleId = schedule3Id.toInt(),
-                    contactId = contact4Id.toInt()
-                )
-            )
-            insertScheduleContact(
-                ScheduleContact(
-                    contactName = "Robert Martinez",
-                    scheduleId = schedule4Id.toInt(),
-                    contactId = contact5Id.toInt()
-                )
-            )
-
-            writeDb.setTransactionSuccessful()
-        } finally {
-            writeDb.endTransaction()
-        }
-    }
-
-    // Contact CRUD operations
-    fun insertContact(contact: Contact): Long {
+    fun syncContactsFromDevice() {
         val db = writableDatabase
+        db.beginTransaction()
+        try {
+            val deviceContactIds = mutableSetOf<Long>()
+            val cursor = context.contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                arrayOf(ContactsContract.Contacts._ID),
+                null,
+                null,
+                null
+            )
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val contactId = it.getLong(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                    deviceContactIds.add(contactId)
+                }
+            }
+
+            val dbContacts = mutableMapOf<Long, ContentValues>()
+            val dbCursor = db.query(
+                TABLE_CONTACT,
+                arrayOf(
+                    COL_ID,
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "phone",
+                    "company",
+                    "address",
+                    "created_at",
+                    "gender",
+                    "birthday"
+                ),
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+            dbCursor?.use {
+                while (it.moveToNext()) {
+                    val contactId = it.getLong(it.getColumnIndexOrThrow(COL_ID))
+                    val values = ContentValues().apply {
+                        put("first_name", it.getString(it.getColumnIndexOrThrow("first_name")))
+                        put("last_name", it.getString(it.getColumnIndexOrThrow("last_name")))
+                        put("email", it.getString(it.getColumnIndexOrThrow("email")))
+                        put("phone", it.getString(it.getColumnIndexOrThrow("phone")))
+                        put("company", it.getString(it.getColumnIndexOrThrow("company")))
+                        put("address", it.getString(it.getColumnIndexOrThrow("address")))
+                        put("created_at", it.getLong(it.getColumnIndexOrThrow("created_at")))
+                        put("gender", it.getString(it.getColumnIndexOrThrow("gender")))
+                        put("birthday", it.getLong(it.getColumnIndexOrThrow("birthday")).takeIf { it > 0 })
+                    }
+                    dbContacts[contactId] = values
+                }
+            }
+
+            val dbContactIds = dbContacts.keys
+            val contactsToDelete = dbContactIds - deviceContactIds
+            for (contactId in contactsToDelete) {
+                db.delete(TABLE_CONTACT, "$COL_ID = ?", arrayOf(contactId.toString()))
+            }
+
+            val deviceCursor = context.contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                arrayOf(
+                    ContactsContract.Contacts._ID,
+                    ContactsContract.Contacts.DISPLAY_NAME
+                ),
+                null,
+                null,
+                null
+            )
+            deviceCursor?.use {
+                while (it.moveToNext()) {
+                    val contactId = it.getLong(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                    val displayName = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)) ?: ""
+
+                    var phone: String? = null
+                    val phoneCursor = context.contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+                        "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+                        arrayOf(contactId.toString()),
+                        null
+                    )
+                    phoneCursor?.use { pc ->
+                        if (pc.moveToFirst()) {
+                            phone = pc.getString(pc.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        }
+                    }
+
+                    var email: String? = null
+                    val emailCursor = context.contentResolver.query(
+                        ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        arrayOf(ContactsContract.CommonDataKinds.Email.ADDRESS),
+                        "${ContactsContract.CommonDataKinds.Email.CONTACT_ID} = ?",
+                        arrayOf(contactId.toString()),
+                        null
+                    )
+                    emailCursor?.use { ec ->
+                        if (ec.moveToFirst()) {
+                            email = ec.getString(ec.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.ADDRESS))
+                        }
+                    }
+
+                    if (contactId in dbContactIds) {
+                        val dbValues = dbContacts[contactId]!!
+                        val name = "${dbValues.getAsString("first_name") ?: ""} ${dbValues.getAsString("last_name") ?: ""}".trim()
+                        val dbPhone = dbValues.getAsString("phone")
+                        val dbEmail = dbValues.getAsString("email")
+
+                        if (name.isNotBlank() || dbPhone != null || dbEmail != null) {
+                            updateContactById(contactId.toString(), name, dbPhone ?: "", dbEmail ?: "")
+                        }
+
+                        val values = ContentValues().apply {
+                            put("first_name", dbValues.getAsString("first_name"))
+                            put("last_name", dbValues.getAsString("last_name"))
+                            put("email", dbEmail ?: email)
+                            put("phone", dbPhone ?: phone)
+                            put("company", dbValues.getAsString("company"))
+                            put("address", dbValues.getAsString("address"))
+                            put("created_at", dbValues.getAsLong("created_at"))
+                            put("gender", dbValues.getAsString("gender"))
+                            put("birthday", dbValues.getAsLong("birthday"))
+                        }
+                        db.update(
+                            TABLE_CONTACT,
+                            values,
+                            "$COL_ID = ?",
+                            arrayOf(contactId.toString())
+                        )
+                    } else if (phone != null) {
+                        val values = ContentValues().apply {
+                            put(COL_ID, contactId)
+                            put("first_name", displayName.split(" ").firstOrNull() ?: displayName)
+                            put("last_name", displayName.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() } ?: "")
+                            put("email", email)
+                            put("phone", phone)
+                            put("created_at", System.currentTimeMillis())
+                            put("gender", "Unknown")
+                            put("birthday", null as Long?)
+                        }
+                        db.insert(TABLE_CONTACT, null, values)
+                    }
+                }
+            }
+
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error syncing contacts: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun syncCallLogsFromDevice() {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_CALL_LOG, null, null)
+
+            val cursor = context.contentResolver.query(
+                CallLog.Calls.CONTENT_URI,
+                arrayOf(
+                    CallLog.Calls.NUMBER,
+                    CallLog.Calls.CACHED_NAME,
+                    CallLog.Calls.DATE,
+                    CallLog.Calls.TYPE,
+                    CallLog.Calls.DURATION
+                ),
+                null,
+                null,
+                "${CallLog.Calls.DATE} DESC"
+            )
+
+            cursor?.use {
+                val numberIdx = it.getColumnIndexOrThrow(CallLog.Calls.NUMBER)
+                val dateIdx = it.getColumnIndexOrThrow(CallLog.Calls.DATE)
+                val typeIdx = it.getColumnIndexOrThrow(CallLog.Calls.TYPE)
+                val durationIdx = it.getColumnIndexOrThrow(CallLog.Calls.DURATION)
+
+                while (it.moveToNext()) {
+                    val number = it.getString(numberIdx) ?: continue
+                    val dateMillis = it.getLong(dateIdx)
+                    val type = it.getInt(typeIdx)
+                    val duration = it.getLong(durationIdx)
+
+                    val callType = when (type) {
+                        CallLog.Calls.INCOMING_TYPE -> "INCOMING"
+                        CallLog.Calls.OUTGOING_TYPE -> "OUTGOING"
+                        CallLog.Calls.MISSED_TYPE -> "MISSED"
+                        else -> continue
+                    }
+
+                    var contactId: Long? = null
+                    val contactCursor = db.query(
+                        TABLE_CONTACT,
+                        arrayOf(COL_ID),
+                        "phone = ?",
+                        arrayOf(number),
+                        null,
+                        null,
+                        null
+                    )
+                    contactCursor?.use { cc ->
+                        if (cc.moveToFirst()) {
+                            contactId = cc.getLong(cc.getColumnIndexOrThrow(COL_ID))
+                        }
+                    }
+
+                    val values = ContentValues().apply {
+                        put("phone", number)
+                        put("call_type", callType)
+                        put("duration", duration)
+                        put("call_time", dateMillis)
+                        put("contact_id", contactId)
+                    }
+                    db.insert(TABLE_CALL_LOG, null, values)
+                }
+            }
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error syncing call logs: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun insertContactWithSync(contact: Contact): Long? {
+        val db = writableDatabase
+        var result: Long? = null
+        db.beginTransaction()
+        try {
+            val contactDeviceId = addContactToDevice(
+                contact.firstName + " " + (contact.lastName ?: ""),
+                contact.phone ?: "",
+                contact.email ?: ""
+            )?.toLong() ?: throw Exception("Failed to add contact to device")
+
+            val values = ContentValues().apply {
+                put(COL_ID, contactDeviceId)
+                put("first_name", contact.firstName)
+                put("last_name", contact.lastName)
+                put("email", contact.email)
+                put("phone", contact.phone)
+                put("company", contact.company)
+                put("address", contact.address)
+                put("created_at", contact.createdAt?.time)
+                put("gender", contact.gender)
+                put("birthday", contact.birthday?.time)
+            }
+            result = db.insert(TABLE_CONTACT, null, values)
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error inserting contact: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            db.endTransaction()
+        }
+        return result
+    }
+
+    fun updateContactWithSync(contact: Contact) {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            val values = ContentValues().apply {
+                put("first_name", contact.firstName)
+                put("last_name", contact.lastName)
+                put("email", contact.email)
+                put("phone", contact.phone)
+                put("company", contact.company)
+                put("address", contact.address)
+                put("created_at", contact.createdAt?.time)
+                put("gender", contact.gender)
+                put("birthday", contact.birthday?.time)
+            }
+            db.update(TABLE_CONTACT, values, "$COL_ID = ?", arrayOf(contact.id.toString()))
+
+            updateContactById(
+                contact.id.toString(),
+                contact.firstName + " " + (contact.lastName ?: ""),
+                contact.phone ?: "",
+                contact.email ?: ""
+            )
+
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error updating contact: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun deleteContactWithSync(id: Int) {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            val cursor = db.query(
+                TABLE_CONTACT,
+                arrayOf("phone"),
+                "$COL_ID = ?",
+                arrayOf(id.toString()),
+                null,
+                null,
+                null
+            )
+            var phone: String? = null
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    phone = it.getString(it.getColumnIndexOrThrow("phone"))
+                }
+            }
+
+            db.delete(TABLE_CONTACT, "$COL_ID = ?", arrayOf(id.toString()))
+
+            if (phone != null) {
+                deleteContactByPhone(phone ?: "")
+            }
+
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error deleting contact: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun insertContact(contact: Contact): Long {
         val values = ContentValues().apply {
             put("first_name", contact.firstName)
             put("last_name", contact.lastName)
@@ -518,7 +508,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             put("gender", contact.gender)
             put("birthday", contact.birthday?.time)
         }
-        return db.insert(TABLE_CONTACT, null, values)
+        return writableDatabase.insert(TABLE_CONTACT, null, values)
     }
 
     fun getAllContacts(): List<Contact> {
@@ -558,7 +548,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
     }
 
     fun updateContact(contact: Contact): Int {
-        val db = writableDatabase
         val values = ContentValues().apply {
             put("first_name", contact.firstName)
             put("last_name", contact.lastName)
@@ -570,12 +559,11 @@ class ContactDatabaseHelper private constructor(context: Context) :
             put("gender", contact.gender)
             put("birthday", contact.birthday?.time)
         }
-        return db.update(TABLE_CONTACT, values, "$COL_ID = ?", arrayOf(contact.id.toString()))
+        return writableDatabase.update(TABLE_CONTACT, values, "$COL_ID = ?", arrayOf(contact.id.toString()))
     }
 
     fun deleteContact(id: Int): Int {
-        val db = writableDatabase
-        return db.delete(TABLE_CONTACT, "$COL_ID = ?", arrayOf(id.toString()))
+        return writableDatabase.delete(TABLE_CONTACT, "$COL_ID = ?", arrayOf(id.toString()))
     }
 
     fun getContactById(id: Int): Contact? {
@@ -632,13 +620,11 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 arrayOf("%$query%", "%$query%"),
                 "first_name ASC, last_name ASC"
             )
-
             "first_name", "last_name", "email", "phone", "company", "address", "gender" -> Triple(
                 "$column LIKE ?",
                 arrayOf("%$query%"),
                 "$column ASC"
             )
-
             else -> throw IllegalArgumentException("Invalid column name: $column")
         }
 
@@ -670,7 +656,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 )
             )
         }
-
         cursor.close()
         return contacts
     }
@@ -717,7 +702,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
         return contacts
     }
 
-    // Note CRUD operations
     fun insertNote(note: Note): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -832,10 +816,10 @@ class ContactDatabaseHelper private constructor(context: Context) :
         return notes
     }
 
-    // Event CRUD operations
     fun insertEvent(event: Event): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
+            put("title", event.title)
             put("content", event.content)
             put("date_time", event.dateTime?.time)
             put("id_note", event.noteId)
@@ -843,7 +827,35 @@ class ContactDatabaseHelper private constructor(context: Context) :
         return db.insert(TABLE_EVENTS, null, values)
     }
 
-    // Schedule CRUD operations
+    fun getEventByNoteId(noteId: Int): List<Event> {
+        val events = mutableListOf<Event>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_EVENTS,
+            null,
+            "id_note = ?",
+            arrayOf(noteId.toString()),
+            null,
+            null,
+            "date_time DESC"
+        )
+
+        while (cursor.moveToNext()) {
+            events.add(
+                Event(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    dateTime = cursor.getLong(cursor.getColumnIndexOrThrow("date_time"))
+                        .let { if (it > 0) Date(it) else null },
+                    noteId = cursor.getInt(cursor.getColumnIndexOrThrow("id_note"))
+                )
+            )
+        }
+        cursor.close()
+        return events
+    }
+
     fun insertSchedule(schedule: Schedule): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -895,7 +907,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
         return schedules
     }
 
-    // ScheduleContact CRUD operations
     fun insertScheduleContact(scheduleContact: ScheduleContact): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -919,7 +930,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
             strftime('%d/%m/%Y', date_time / 1000, 'unixepoch') LIKE ? OR
             strftime('%H:%M:%S', date_time / 1000, 'unixepoch') LIKE ?
         ORDER BY id DESC
-    """
+        """
 
         val likeParam = "%$searchParam%"
         val cursor = db.rawQuery(query, arrayOf(likeParam, likeParam, likeParam, likeParam, likeParam))
@@ -946,7 +957,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
         SELECT c.* FROM $TABLE_CONTACT c
         INNER JOIN $TABLE_SCHEDULE_CONTACT sc ON c.$COL_ID = sc.contact_id
         WHERE sc.schedule_id = ?
-    """.trimIndent()
+        """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(scheduleId.toString()))
 
@@ -967,7 +978,6 @@ class ContactDatabaseHelper private constructor(context: Context) :
             )
             contacts.add(contact)
         }
-
         cursor.close()
         return contacts
     }
@@ -987,6 +997,7 @@ class ContactDatabaseHelper private constructor(context: Context) :
                 values.clear()
                 values.put("schedule_id", scheduleId)
                 values.put("contact_id", contact.id)
+                values.put("contact_name", "${contact.firstName} ${contact.lastName ?: ""}".trim())
                 db.insert(TABLE_SCHEDULE_CONTACT, null, values)
             }
 
@@ -1025,5 +1036,425 @@ class ContactDatabaseHelper private constructor(context: Context) :
     fun deleteSchedule(id: Int): Int {
         val db = writableDatabase
         return db.delete(TABLE_SCHEDULE, "$COL_ID = ?", arrayOf(id.toString()))
+    }
+
+    fun updateListEventByNoteId(noteId: Int, updatedEvents: List<Event>) {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_EVENTS, "id_note = ?", arrayOf(noteId.toString()))
+
+            for (event in updatedEvents) {
+                val values = ContentValues().apply {
+                    put("title", event.title)
+                    put("content", event.content)
+                    put("date_time", event.dateTime?.time ?: System.currentTimeMillis())
+                    put("id_note", noteId)
+                }
+                db.insert(TABLE_EVENTS, null, values)
+            }
+
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun getScheduleContactsByContactId(contactId: Int): List<ScheduleContact> {
+        val scheduleContacts = mutableListOf<ScheduleContact>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_SCHEDULE_CONTACT,
+            null,
+            "contact_id = ?",
+            arrayOf(contactId.toString()),
+            null,
+            null,
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            scheduleContacts.add(
+                ScheduleContact(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    contactName = cursor.getString(cursor.getColumnIndexOrThrow("contact_name")),
+                    scheduleId = cursor.getInt(cursor.getColumnIndexOrThrow("schedule_id")),
+                    contactId = cursor.getInt(cursor.getColumnIndexOrThrow("contact_id"))
+                )
+            )
+        }
+        cursor.close()
+        return scheduleContacts
+    }
+
+    private fun addContactToDevice(name: String, phone: String, email: String): String? {
+        val ops = ArrayList<ContentProviderOperation>()
+
+        ops.add(
+            ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                .build()
+        )
+
+        ops.add(
+            ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                    ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
+                )
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
+                .build()
+        )
+
+        ops.add(
+            ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                    ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                )
+                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+                .withValue(
+                    ContactsContract.CommonDataKinds.Phone.TYPE,
+                    ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE
+                )
+                .build()
+        )
+
+        ops.add(
+            ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                    ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
+                )
+                .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email)
+                .withValue(
+                    ContactsContract.CommonDataKinds.Email.TYPE,
+                    ContactsContract.CommonDataKinds.Email.TYPE_WORK
+                )
+                .build()
+        )
+
+        try {
+            val results = context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+            val rawContactUri = results[0].uri
+            return rawContactUri?.lastPathSegment
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    private fun updateContactById(contactId: String, name: String, newPhone: String, newEmail: String) {
+        val ops = ArrayList<ContentProviderOperation>()
+
+        ops.add(
+            ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(
+                    "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+                    arrayOf(contactId, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                )
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
+                .build()
+        )
+
+        val phoneCursor = context.contentResolver.query(
+            ContactsContract.Data.CONTENT_URI,
+            arrayOf(ContactsContract.Data.RAW_CONTACT_ID),
+            "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+            arrayOf(contactId, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE),
+            null
+        )
+        var rawContactId: String? = null
+        phoneCursor?.use {
+            if (it.moveToFirst()) {
+                rawContactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Data.RAW_CONTACT_ID))
+                ops.add(
+                    ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                        .withSelection(
+                            "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+                            arrayOf(contactId, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                        )
+                        .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, newPhone)
+                        .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                        .build()
+                )
+            }
+        }
+        if (rawContactId == null && newPhone.isNotBlank()) {
+            val rawContactCursor = context.contentResolver.query(
+                ContactsContract.RawContacts.CONTENT_URI,
+                arrayOf(ContactsContract.RawContacts._ID),
+                "${ContactsContract.RawContacts.CONTACT_ID} = ?",
+                arrayOf(contactId),
+                null
+            )
+            rawContactCursor?.use {
+                if (it.moveToFirst()) {
+                    rawContactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.RawContacts._ID))
+                    ops.add(
+                        ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                            .withValue(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                            .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                            .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, newPhone)
+                            .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                            .build()
+                    )
+                }
+            }
+        }
+
+        val emailCursor = context.contentResolver.query(
+            ContactsContract.Data.CONTENT_URI,
+            arrayOf(ContactsContract.Data.RAW_CONTACT_ID),
+            "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+            arrayOf(contactId, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE),
+            null
+        )
+        emailCursor?.use {
+            if (it.moveToFirst()) {
+                rawContactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Data.RAW_CONTACT_ID))
+                ops.add(
+                    ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                        .withSelection(
+                            "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+                            arrayOf(contactId, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                        )
+                        .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, newEmail)
+                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                        .build()
+                )
+            }
+        }
+        if (rawContactId == null && newEmail.isNotBlank()) {
+            val rawContactCursor = context.contentResolver.query(
+                ContactsContract.RawContacts.CONTENT_URI,
+                arrayOf(ContactsContract.RawContacts._ID),
+                "${ContactsContract.RawContacts.CONTACT_ID} = ?",
+                arrayOf(contactId),
+                null
+            )
+            rawContactCursor?.use {
+                if (it.moveToFirst()) {
+                    rawContactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.RawContacts._ID))
+                    ops.add(
+                        ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                            .withValue(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                            .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                            .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, newEmail)
+                            .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                            .build()
+                    )
+                }
+            }
+        }
+
+        try {
+            if (ops.isNotEmpty()) {
+                context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+            } else {
+                Toast.makeText(context, "No updates applied for contact ID $contactId", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error updating contact: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun deleteContactByPhone(phoneNumber: String) {
+
+        val normalizedPhone = phoneNumber.replace("[^0-9+]".toRegex(), "")
+
+        val cursor = context.contentResolver.query(
+            ContactsContract.Data.CONTENT_URI,
+            arrayOf(ContactsContract.Data.CONTACT_ID),
+            "${ContactsContract.Data.MIMETYPE} = ? AND ${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?",
+            arrayOf(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, normalizedPhone),
+            null
+        )
+
+        var contactId: String? = null
+        cursor?.use {
+            if (it.moveToFirst()) {
+                contactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Data.CONTACT_ID))
+            }
+        }
+
+        if (contactId == null) {
+            Toast.makeText(context, "Contact not found for phone number: $phoneNumber", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val ops = ArrayList<ContentProviderOperation>()
+            ops.add(
+                ContentProviderOperation.newDelete(ContactsContract.RawContacts.CONTENT_URI)
+                    .withSelection(
+                        "${ContactsContract.RawContacts.CONTACT_ID} = ?",
+                        arrayOf(contactId)
+                    )
+                    .build()
+            )
+
+            context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error deleting contact: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun getCallLogStatistics(timeRange: TimeRange): List<CallLogStats> {
+        val stats = mutableListOf<CallLogStats>()
+        val db = readableDatabase
+        val calendar = Calendar.getInstance()
+
+        val (selection, selectionArgs) = when (timeRange) {
+            TimeRange.TODAY -> {
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfDay = calendar.timeInMillis
+                "cl.call_time >= ?" to arrayOf(startOfDay.toString())
+            }
+            TimeRange.THIS_WEEK -> {
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfWeek = calendar.timeInMillis
+                "cl.call_time >= ?" to arrayOf(startOfWeek.toString())
+            }
+            TimeRange.THIS_MONTH -> {
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfMonth = calendar.timeInMillis
+                "cl.call_time >= ?" to arrayOf(startOfMonth.toString())
+            }
+            TimeRange.THIS_YEAR -> {
+                calendar.set(Calendar.DAY_OF_YEAR, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfYear = calendar.timeInMillis
+                "cl.call_time >= ?" to arrayOf(startOfYear.toString())
+            }
+            TimeRange.ALL -> "" to emptyArray()
+        }
+
+        val query = """
+        SELECT 
+            COALESCE(c.first_name || ' ' || c.last_name, cl.phone) AS contact_name,
+            SUM(cl.duration) AS total_duration,
+            COUNT(*) AS call_count
+        FROM $TABLE_CALL_LOG cl
+        LEFT JOIN $TABLE_CONTACT c ON cl.contact_id = c.$COL_ID
+        ${if (selection.isNotEmpty()) "WHERE $selection" else ""}
+        GROUP BY cl.contact_id, cl.phone
+        ORDER BY total_duration DESC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, selectionArgs)
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val contactName = it.getString(it.getColumnIndexOrThrow("contact_name")) ?: "Unknown"
+                val totalDuration = it.getLong(it.getColumnIndexOrThrow("total_duration"))
+                val callCount = it.getInt(it.getColumnIndexOrThrow("call_count"))
+
+                stats.add(
+                    CallLogStats(
+                        contactName = contactName,
+                        totalDuration = totalDuration,
+                        callCount = callCount
+                    )
+                )
+            }
+        }
+        cursor.close()
+        return stats
+    }
+
+    fun getScheduleStatistics(timeRange: TimeRange): List<ScheduleStats> {
+        val stats = mutableListOf<ScheduleStats>()
+        val db = readableDatabase
+        val calendar = Calendar.getInstance()
+
+        val (selection, selectionArgs) = when (timeRange) {
+            TimeRange.TODAY -> {
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfDay = calendar.timeInMillis
+                "s.date_time >= ?" to arrayOf(startOfDay.toString())
+            }
+            TimeRange.THIS_WEEK -> {
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfWeek = calendar.timeInMillis
+                "s.date_time >= ?" to arrayOf(startOfWeek.toString())
+            }
+            TimeRange.THIS_MONTH -> {
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfMonth = calendar.timeInMillis
+                "s.date_time >= ?" to arrayOf(startOfMonth.toString())
+            }
+            TimeRange.THIS_YEAR -> {
+                calendar.set(Calendar.DAY_OF_YEAR, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfYear = calendar.timeInMillis
+                "s.date_time >= ?" to arrayOf(startOfYear.toString())
+            }
+            TimeRange.ALL -> "" to emptyArray()
+        }
+
+        val query = """
+        SELECT 
+            COALESCE(c.first_name || ' ' || c.last_name, sc.contact_name) AS contact_name,
+            COUNT(*) AS schedule_count
+        FROM $TABLE_SCHEDULE_CONTACT sc
+        INNER JOIN $TABLE_SCHEDULE s ON sc.schedule_id = s.$COL_ID
+        LEFT JOIN $TABLE_CONTACT c ON sc.contact_id = c.$COL_ID
+        ${if (selection.isNotEmpty()) "WHERE $selection" else ""}
+        GROUP BY sc.contact_id, sc.contact_name
+        ORDER BY schedule_count DESC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, selectionArgs)
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val contactName = it.getString(it.getColumnIndexOrThrow("contact_name")) ?: "Unknown"
+                val scheduleCount = it.getInt(it.getColumnIndexOrThrow("schedule_count"))
+
+                stats.add(
+                    ScheduleStats(
+                        contactName = contactName,
+                        scheduleCount = scheduleCount
+                    )
+                )
+            }
+        }
+        cursor.close()
+        return stats
     }
 }

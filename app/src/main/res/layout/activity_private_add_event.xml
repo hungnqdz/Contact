@@ -13,7 +13,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/black">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_back"
@@ -22,7 +22,7 @@
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:padding="@dimen/_5sdp"
-            android:tint="@color/primary"
+            android:tint="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back" />
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thêm sự kiện"
-            android:textColor="@color/primary"
+            android:textColor="@color/white"
             android:textSize="@dimen/_15sdp"
             app:layout_constraintBottom_toBottomOf="@id/btn_back"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/_15sdp"
             android:text="Lưu"
-            android:textColor="@color/primary"
+            android:textColor="@color/white"
             android:textSize="@dimen/_13ssp"
             app:layout_constraintBottom_toBottomOf="@id/btn_back"
             app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
             android:text="Thời gian"
             android:textStyle="bold"
             android:layout_marginTop="@dimen/_15sdp"
-            android:textColor="@color/primary"
+            android:textColor="@color/white"
             android:textSize="@dimen/_13ssp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_back" />
@@ -69,6 +69,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="@dimen/_5sdp"
+            android:backgroundTint="@color/black"
             app:layout_constraintTop_toTopOf="@id/labeled"
             app:layout_constraintStart_toEndOf="@id/labeled"
             android:layout_marginStart="@dimen/_20sdp"
@@ -86,7 +87,7 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:tint="@color/primary"
+                android:tint="@color/white"
                 app:srcCompat="@drawable/ic_schedule" />
         </LinearLayout>
 
@@ -96,13 +97,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_5sdp"
             android:hint="Tiêu đề"
-            android:background="@color/white"
+            android:background="@color/black"
             android:inputType="text"
             android:text="@{event.title}"
             android:textStyle="bold"
             android:layout_marginStart="@dimen/_15sdp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/_71717a"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="@dimen/_20ssp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_time" />
@@ -114,11 +115,11 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:hint="Nhập nội dung..."
             android:text="@{event.content}"
-            android:background="@color/white"
+            android:background="@color/black"
             android:inputType="text"
             android:layout_marginStart="@dimen/_15sdp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/_71717a"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="@dimen/_10ssp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title" />

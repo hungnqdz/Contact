@@ -20,10 +20,10 @@ object AppBindingAdapter {
     @BindingAdapter("keySearch", "textData")
     fun AppCompatTextView.setContent(key: String?, text: String?) {
         key?.let { searchText ->
-            text?.let {
-                if (it.contains(searchText, true)) {
-                    val colorText = SpannableString(it)
-                    val startIndex = it.indexOf(searchText, ignoreCase = true)
+            text?.let { dataText ->
+                if (dataText.contains(searchText, true)) {
+                    val colorText = SpannableString(dataText)
+                    val startIndex = dataText.indexOf(searchText, ignoreCase = true)
                     colorText.setSpan(
                         ForegroundColorSpan(resources.getColor(R.color.primary)),
                         startIndex,

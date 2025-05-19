@@ -8,10 +8,12 @@ import com.contact_app.contact.base.OnItemClickListener
 import com.contact_app.contact.base.OnLongClickListener
 import com.contact_app.contact.model.Contact
 import com.contact_app.contact.BR
+import com.contact_app.contact.databinding.ItemContactBinding
 
 class ContactAdapter(
     private val onClickListener: OnItemClickListener<Contact>,
-    private val onLongClickListener: OnLongClickListener<Contact>
+    private val onLongClickListener: OnLongClickListener<Contact>? = null,
+    private val layoutItem: Int = R.layout.item_contact
 ) :
     BaseListAdapter<Contact>(
         onItemClick = onClickListener,
@@ -24,14 +26,14 @@ class ContactAdapter(
                 return oldItem == newItem
             }
 
-        }, layoutId = R.layout.item_contact
+        }, layoutId = layoutItem
     ) {
 
     override fun onBindData(viewBinding: ViewDataBinding, item: Contact, position: Int) {
         super.onBindData(viewBinding, item, position)
         viewBinding.apply {
             this.root.setOnLongClickListener {
-                onLongClickListener.onItemPositionLongClicked(position)
+                onLongClickListener?.onItemPositionLongClicked(position)
                 false
             }
             this.root.isLongClickable = true

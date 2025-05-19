@@ -8,13 +8,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.contact_app.contact.ChooseContactActivity
+import com.contact_app.contact.MainActivity
 import com.contact_app.contact.R
 import com.contact_app.contact.base.BaseBottomSheet
 import com.contact_app.contact.databinding.BottomLayoutScheduleBinding
 import com.contact_app.contact.db.ContactDatabaseHelper
 import com.contact_app.contact.model.Contact
 import com.contact_app.contact.model.Schedule
-import com.contact_app.contact.model.ScheduleContact
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,7 +34,8 @@ class BottomSheetScheduleForm : BaseBottomSheet<BottomLayoutScheduleBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = ContactDatabaseHelper.getInstance(requireContext())
+        val activity = requireActivity() as MainActivity
+        dbHelper = activity.dbHelper
         if (schedule.id != null) {
             listChosenContact = dbHelper.getContactsByScheduleId(schedule.id!!) as MutableList
             viewBinding.tvContactName.text = generateTextName()

@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.contact_app.contact"
-        minSdk 24
+        minSdk 26
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -132,6 +132,11 @@ dependencies {
 
     // Android Chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    implementation 'net.zetetic:android-database-sqlcipher:4.5.0'
+    implementation 'org.mindrot:jbcrypt:0.4'
+
+    implementation 'androidx.core:core:1.13.1'
 
 }
 kapt {

@@ -1,40 +1,37 @@
 package com.contact_app.contact
 
-import addContact
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.contact_app.contact.base.BaseActivity
-import com.contact_app.contact.databinding.ActivityAddContactBinding
-import com.contact_app.contact.db.ContactDatabaseHelper
+import com.contact_app.contact.databinding.ActivityPrivateFormContactBinding
+import com.contact_app.contact.db.CipherContactDatabaseHelper
 import com.contact_app.contact.model.Contact
 import java.util.Calendar
-import updateContactByName
 
-
-class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
-    override val layoutId: Int get() = R.layout.activity_add_contact
+class ActivityPrivateFormContact : BaseActivity<ActivityPrivateFormContactBinding>() {
+    override val layoutId: Int get() =
+        R.layout.activity_private_form_contact
     private lateinit var contact: Contact
-
+    lateinit var dbPrivateHelper: CipherContactDatabaseHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = Color.BLACK
+        window.decorView.systemUiVisibility = 0
+        dbPrivateHelper = CipherContactDatabaseHelper.getInstance(this)
+
         contact = intent.getSerializableExtra("contact") as? Contact ?: Contact()
         viewBinding.apply {
-            // Set header text
-            tvHeader.text =
-                if (contact.id == null) getString(R.string.new_contact) else getString(
-                    R.string.edit_contact
-                )
-            if (contact.id != null) contactBinding = contact
+            if (this@ActivityPrivateFormContact.contact.id != null) contact =
+                this@ActivityPrivateFormContact.contact
 
-
-            // Birthday picker
             tvBirthday.setOnClickListener {
                 val calendar = Calendar.getInstance()
                 DatePickerDialog(
-                    this@FormContactActivity,
+                    this@ActivityPrivateFormContact,
                     { _, year, month, dayOfMonth ->
                         val selectedDate =
                             String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
@@ -46,29 +43,21 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 ).show()
             }
 
-            // Back button
             btnBack.setOnClickListener { finish() }
 
             btnSave.setOnClickListener {
                 if (validateForm()) {
-                    if (contact.id == null) {
-                        dbHelper.insertContactWithSync(contact)
-                        val resultIntent = Intent()
-                        resultIntent.putExtra("isCreate", true);
-                        setResult(RESULT_OK, resultIntent)
-                    } else {
-                        dbHelper.updateContactWithSync(contact)
-                        val resultIntent = Intent()
-                        resultIntent.putExtra("isUpdate", true);
-                        setResult(RESULT_OK, resultIntent)
-                    }
+                    dbPrivateHelper.updateContact(this@ActivityPrivateFormContact.contact)
+                    val resultIntent = Intent()
+                    resultIntent.putExtra("isUpdate", true);
+                    setResult(RESULT_OK, resultIntent);
+                    Toast.makeText(
+                        this@ActivityPrivateFormContact,
+                        "Dữ liệu đã được cập nhật",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finishActivityWithResult("isUpdate",true)
                 }
-                finish()
-                Toast.makeText(
-                    this@FormContactActivity,
-                    "Dữ liệu đã được cập nhật",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
@@ -76,7 +65,6 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
     private fun validateForm(): Boolean {
         var isValid = true
         viewBinding.apply {
-            // Phone validation
             val phone = phoneEditText.text?.toString()?.trim()
             if (phone.isNullOrEmpty()) {
                 phoneInputLayout.error = getString(R.string.phone_required)
@@ -86,7 +74,7 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 isValid = false
             } else {
                 phoneInputLayout.error = null
-                this@FormContactActivity.contact.phone = phone
+                this@ActivityPrivateFormContact.contact.phone = phone
             }
 
             // First name validation
@@ -96,11 +84,12 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 isValid = false
             } else {
                 firstNameInputLayout.error = null
-                this@FormContactActivity.contact.firstName = firstName
+                this@ActivityPrivateFormContact.contact.firstName = firstName
             }
 
             // Last name (optional)
-            this@FormContactActivity.contact.lastName = lastNameEditText.text?.toString()?.trim()
+            this@ActivityPrivateFormContact.contact.lastName =
+                lastNameEditText.text?.toString()?.trim()
 
             // Email validation
             val email = emailEditText.text?.toString()?.trim()
@@ -111,7 +100,7 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 isValid = false
             } else {
                 emailInputLayout.error = null
-                this@FormContactActivity.contact.email = email
+                this@ActivityPrivateFormContact.contact.email = email
             }
 
             // Birthday validation
@@ -121,7 +110,7 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 isValid = false
             } else {
                 birthdayInputLayout.error = null
-                this@FormContactActivity.contact.setBirthContact(birthday)
+                this@ActivityPrivateFormContact.contact.setBirthContact(birthday)
             }
             val gender = genderEditText.text?.toString()?.trim()
             Log.d("CONTACT", "$gender")
@@ -130,14 +119,16 @@ class FormContactActivity : BaseActivity<ActivityAddContactBinding>() {
                 isValid = false
             } else {
                 genderEditText.error = null
-                this@FormContactActivity.contact.gender = gender
+                this@ActivityPrivateFormContact.contact.gender = gender
             }
-            this@FormContactActivity.contact.address = addressEditText.text?.toString()?.trim()
-            this@FormContactActivity.contact.company = companyEditText.text?.toString()?.trim()
-            Log.d("CONTACT", "${this@FormContactActivity.contact}")
+            this@ActivityPrivateFormContact.contact.address =
+                addressEditText.text?.toString()?.trim()
+            this@ActivityPrivateFormContact.contact.company =
+                companyEditText.text?.toString()?.trim()
+            Log.d("CONTACT", "${this@ActivityPrivateFormContact.contact}")
             if (!isValid) {
                 Toast.makeText(
-                    this@FormContactActivity,
+                    this@ActivityPrivateFormContact,
                     getString(R.string.validation_error),
                     Toast.LENGTH_SHORT
                 ).show()

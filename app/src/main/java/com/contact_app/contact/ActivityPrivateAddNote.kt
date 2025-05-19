@@ -1,6 +1,7 @@
 package com.contact_app.contact
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -10,16 +11,19 @@ import com.contact_app.contact.base.BaseActivity
 import com.contact_app.contact.base.BaseListAdapter
 import com.contact_app.contact.base.OnItemClickListener
 import com.contact_app.contact.databinding.ActivityAddNoteBinding
+import com.contact_app.contact.databinding.ActivityPrivateAddNoteBinding
+import com.contact_app.contact.db.CipherContactDatabaseHelper
 import com.contact_app.contact.db.ContactDatabaseHelper
 import com.contact_app.contact.model.Contact
 import com.contact_app.contact.model.Event
 import com.contact_app.contact.model.Note
 
-class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListener<Event> {
+class ActivityPrivateAddNote : BaseActivity<ActivityPrivateAddNoteBinding>(), OnItemClickListener<Event> {
     override val layoutId: Int
-        get() = R.layout.activity_add_note
+        get() = R.layout.activity_private_add_note
     var note = Note()
     val listEvent = mutableListOf<Event>()
+    val dbPrivateHelper by lazy { CipherContactDatabaseHelper.getInstance(this) }
     var contact = Contact()
     val adapter by lazy {
         BaseListAdapter<Event>(
@@ -34,17 +38,19 @@ class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListe
                 }
 
             },
-            layoutId = R.layout.item_event
+            layoutId = R.layout.item_private_event
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = Color.BLACK
+        window.decorView.systemUiVisibility = 0
         note = intent.getSerializableExtra("note") as? Note ?: Note()
         contact = intent.getSerializableExtra("contact") as? Contact ?: Contact()
         if (note.id != null) {
             listEvent.clear()
-            listEvent.addAll(dbHelper.getEventByNoteId(noteId = note.id!!))
+            listEvent.addAll(dbPrivateHelper.getEventByNoteId(noteId = note.id!!))
             viewBinding.noteBinding = note
         }
         viewBinding.apply {
@@ -57,7 +63,7 @@ class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListe
         }
         viewBinding.apply {
             btnAddEvent.setOnClickListener {
-                startActivityForResultCompat(AddEventActivity::class.java, 2)
+                startActivityForResultCompat(ActivityPrivateAddEvent::class.java, 2)
             }
         }
 
@@ -95,10 +101,10 @@ class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListe
 
     private fun saveNote(title: String, content: String, comment: String) {
         if (note.id != null) {
-            dbHelper.updateNote(note.copy(title = title, content = content, comment = comment))
-            dbHelper.updateListEventByNoteId(noteId = note.id!!, listEvent)
+            dbPrivateHelper.updateNote(note.copy(title = title, content = content, comment = comment))
+            dbPrivateHelper.updateListEventByNoteId(noteId = note.id!!, listEvent)
         } else {
-            val noteId = dbHelper.insertNote(
+            val noteId = dbPrivateHelper.insertNote(
                 Note(
                     title = title,
                     content = content,
@@ -106,14 +112,14 @@ class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListe
                     contactId = contact.id
                 )
             ).toInt()
-            dbHelper.updateListEventByNoteId(noteId, listEvent)
+            dbPrivateHelper.updateListEventByNoteId(noteId, listEvent)
         }
         showSnackbar("Ghi chú đã được lưu thành công")
         finishActivityWithResult(value = true)
     }
 
     private fun showSnackbar(message: String) {
-        Toast.makeText(this@AddNoteActivity, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@ActivityPrivateAddNote, message, Toast.LENGTH_SHORT).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -136,7 +142,7 @@ class AddNoteActivity : BaseActivity<ActivityAddNoteBinding>(), OnItemClickListe
 
     override fun onItemClicked(item: Event) {
         super.onItemClicked(item)
-        startActivityForResultCompat(AddEventActivity::class.java, 2, "event" to item)
+        startActivityForResultCompat(ActivityPrivateAddEvent::class.java, 2, "event" to item)
     }
 
 

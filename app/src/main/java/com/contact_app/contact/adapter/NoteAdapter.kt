@@ -8,7 +8,8 @@ import com.contact_app.contact.model.Note
 import com.contact_app.contact.model.Schedule
 
 class NoteAdapter (
-    private val onClickListener: OnItemClickListener<Note>
+    private val onClickListener: OnItemClickListener<Note>,
+    private val layoutItem: Int = R.layout.item_note
 ) :
     BaseListAdapter<Note>(
         onItemClick = onClickListener,
@@ -20,6 +21,6 @@ class NoteAdapter (
             override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
                 return oldItem == newItem
             }
-        }, layoutId = R.layout.item_note
+        }, layoutId = layoutItem
     ) {
 }

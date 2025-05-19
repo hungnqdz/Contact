@@ -1,17 +1,14 @@
 package com.contact_app.contact.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.contact_app.contact.DetailContactActivity
+import com.contact_app.contact.MainActivity
 import com.contact_app.contact.R
 import com.contact_app.contact.adapter.CallbackScheduleAdapter
 import com.contact_app.contact.adapter.ScheduleAdapter
@@ -54,7 +51,8 @@ class ListScheduleFragment : Fragment(), OnItemClickListener<Schedule> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = ContactDatabaseHelper.getInstance(requireContext())
+        val activity = requireActivity() as MainActivity
+        dbHelper = activity.dbHelper
         bottomSheetScheduleForm.callBack = object : CallbackSchedule {
             override fun onSave() {
                 scheduleList = dbHelper.getAllSchedules().toMutableList()

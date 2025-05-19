@@ -18,7 +18,6 @@ class ChooseContactActivity : BaseActivity<ActivityChooseContactBinding>(), OnIt
     override val layoutId: Int
         get() = R.layout.activity_choose_contact
     private var listContacts = mutableListOf<Contact>()
-    private lateinit var dbHelper: ContactDatabaseHelper
     private lateinit var chosenContacts: MutableList<Contact>
     private val adapter by lazy {
         ChooseContactAdapter(this, object : CallBackChecked {
@@ -37,7 +36,6 @@ class ChooseContactActivity : BaseActivity<ActivityChooseContactBinding>(), OnIt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding.apply {
-            dbHelper = ContactDatabaseHelper.getInstance(this@ChooseContactActivity)
             listContacts = dbHelper.getAllContacts().toMutableList()
             chosenContacts = (intent.getSerializableExtra("CHOSEN_CONTACTS") as? List<Contact>)?.toMutableList() ?: mutableListOf()
             Log.d("CHOSEN","$chosenContacts")

@@ -21,7 +21,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getDatabaseFile()
         viewBinding.apply {
             navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.frg_container) as NavHostFragment
@@ -44,9 +43,4 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    fun getDatabaseFile(): File {
-        val dbPath = applicationContext.getDatabasePath("contact_database.db").path
-        Log.d("DB",dbPath)
-        return File(dbPath)
-    }
 }

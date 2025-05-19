@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,24 +13,26 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.contact_app.contact.AskPasswordActivity
 import com.contact_app.contact.DetailContactActivity
 import com.contact_app.contact.FormContactActivity
+import com.contact_app.contact.MainActivity
 import com.contact_app.contact.R
+import com.contact_app.contact.SetPasswordActivity
 import com.contact_app.contact.adapter.ContactAdapter
 import com.contact_app.contact.adapter.SearchColumn
-import com.contact_app.contact.adapter.SearchSpinnerAdapter
+import com.contact_app.contact.adapter.CustomSpinnerAdapter
 import com.contact_app.contact.base.OnItemClickListener
 import com.contact_app.contact.base.OnLongClickListener
 import com.contact_app.contact.base.dragging
 import com.contact_app.contact.databinding.FragmentHomeBinding
-import com.contact_app.contact.db.ContactDatabaseHelper
 import com.contact_app.contact.dialog.DialogSort
 import com.contact_app.contact.dialog.DialogSortCallBack
 import com.contact_app.contact.dialog.Order
 import com.contact_app.contact.dialog.SortColumn
 import com.contact_app.contact.model.Contact
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import com.contact_app.contact.sharepref.SharePrefHelper
+import com.google.gson.Gson
 
 class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListener<Contact> {
     private lateinit var viewBinding: FragmentHomeBinding
@@ -39,10 +40,10 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
         ContactAdapter(this, this)
     }
     private var listContacts = mutableListOf<Contact>()
-    private lateinit var dbHelper: ContactDatabaseHelper
     private var searchColumn: SearchColumn? = SearchColumn.NAME
 
     var dialogSort: DialogSort = DialogSort()
+    lateinit var sharePrefHelper: SharePrefHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,11 +62,22 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = ContactDatabaseHelper.getInstance(requireContext())
-        listContacts = dbHelper.getAllContacts() as MutableList
+        val activity = requireActivity() as MainActivity
+        sharePrefHelper = SharePrefHelper(requireContext(), Gson())
+        val isPermitted = sharePrefHelper.get("isPermitted",Boolean::class.java,false)
+        if (isPermitted == true) {
+            listContacts = activity.dbHelper.getAllContacts() as MutableList
+            adapter.submitList(listContacts)
+            viewBinding.numberContact = activity.dbHelper.countContacts()
+        }
+        activity.onPermitted = {
+            listContacts = activity.dbHelper.getAllContacts() as MutableList
+            adapter.submitList(listContacts)
+            sharePrefHelper.put("isPermitted", true)
+            viewBinding.numberContact = activity.dbHelper.countContacts()
+        }
         viewBinding.apply {
-            this.adapter = this@HomeFragment.adapter
-            numberContact = dbHelper.countContacts()
+            adapter = this@HomeFragment.adapter
             searchInput.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -78,12 +90,12 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                 override fun afterTextChanged(p0: Editable?) {
                     this@HomeFragment.adapter.setKeySearch(p0.toString(), searchColumn)
                     if (p0.toString().isBlank()) {
-                        this@HomeFragment.adapter.submitList(dbHelper.getAllContacts())
+                        this@HomeFragment.adapter.submitList(activity.dbHelper.getAllContacts())
                         contactNum.visibility = View.VISIBLE
                         contactLabel.visibility = View.VISIBLE
                         return
                     }
-                    listContacts = dbHelper.search(
+                    listContacts = activity.dbHelper.search(
                         p0.toString(),
                         searchColumn?.column ?: "name"
                     ) as MutableList
@@ -96,7 +108,7 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                 }
 
             })
-            val spinnerAdapter = SearchSpinnerAdapter(
+            val spinnerAdapter = CustomSpinnerAdapter(
                 requireContext(), R.layout.item_spinner,
                 listOf("Tên", "Công ty", "Số điện thoại", "Email")
             )
@@ -130,7 +142,7 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
 
                                 override fun onConfirm(sortBy: SortColumn?, order: Order?) {
                                     this@HomeFragment.adapter.submitList(
-                                        dbHelper.sortContacts(
+                                        activity.dbHelper.sortContacts(
                                             sortBy?.column.toString(),
                                             order?.order.toString()
                                         )
@@ -151,6 +163,7 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
                         }
 
                         R.id.private_storage -> {
+                            navToPrivate()
                             true
                         }
 
@@ -172,8 +185,6 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
             }
             btnCall.setOnTouchListener(dragging)
         }
-        adapter.submitList(listContacts)
-
     }
 
 
@@ -200,9 +211,19 @@ class HomeFragment : Fragment(), OnItemClickListener<Contact>, OnLongClickListen
             val result = data?.getBooleanExtra("isUpdate", false)
             val resultCreate = data?.getBooleanExtra("isCreate", false)
             if (result == true || resultCreate == true) {
-                adapter.submitList(dbHelper.getAllContacts())
-                viewBinding.numberContact = dbHelper.countContacts()
+                val activity = requireActivity() as MainActivity
+                adapter.submitList(activity.dbHelper.getAllContacts())
+                viewBinding.numberContact = activity.dbHelper.countContacts()
             }
         }
+    }
+
+    fun navToPrivate() {
+        val isSetPassword = sharePrefHelper.get("isCreatePassword", Boolean::class.java, false)
+        val intent = Intent(
+            requireContext(),
+            if (isSetPassword == true) AskPasswordActivity::class.java else SetPasswordActivity::class.java
+        )
+        startActivity(intent)
     }
 }
