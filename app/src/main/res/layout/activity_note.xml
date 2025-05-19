@@ -67,7 +67,7 @@
                 android:maxLines="3"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:text="Huyen không có ghi chú nào, hãy tạo ghi chú cho Huyen"
+                android:text="Không có ghi chú"
                 android:textColor="@color/primary"
                 android:textSize="@dimen/_15sdp" />
         </LinearLayout>

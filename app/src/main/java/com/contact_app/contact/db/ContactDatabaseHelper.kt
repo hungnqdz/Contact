@@ -201,7 +201,7 @@ class ContactDatabaseHelper private constructor(private val context: Context, pr
                 null,
                 null
             )
-            dbCursor?.use {
+            dbCursor.use {
                 while (it.moveToNext()) {
                     val contactId = it.getLong(it.getColumnIndexOrThrow(COL_ID))
                     val values = ContentValues().apply {
@@ -282,7 +282,7 @@ class ContactDatabaseHelper private constructor(private val context: Context, pr
                             put("first_name", dbValues.getAsString("first_name"))
                             put("last_name", dbValues.getAsString("last_name"))
                             put("email", dbEmail ?: email)
-                            put("phone", dbPhone ?: phone)
+                            put("phone", dbPhone.replace(Regex("[^\\d]"), ""))
                             put("company", dbValues.getAsString("company"))
                             put("address", dbValues.getAsString("address"))
                             put("created_at", dbValues.getAsLong("created_at"))
@@ -301,7 +301,7 @@ class ContactDatabaseHelper private constructor(private val context: Context, pr
                             put("first_name", displayName.split(" ").firstOrNull() ?: displayName)
                             put("last_name", displayName.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() } ?: "")
                             put("email", email)
-                            put("phone", phone)
+                            put("phone", phone?.replace(Regex("[^\\d]"), ""))
                             put("created_at", System.currentTimeMillis())
                             put("gender", "Unknown")
                             put("birthday", null as Long?)
