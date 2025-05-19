@@ -169,7 +169,7 @@ class ChartFragment : Fragment() {
         textViewIds.forEachIndexed { index, (nameView, countView, durationView) ->
             if (index < topContacts.size) {
                 val contact = topContacts[index]
-                nameView.text = contact.contactName
+                nameView.text = contact.contactName.trim()
                 countView.text = contact.callCount.toString()
                 durationView.text = formatDuration(contact.totalDuration)
                 // Set text color
