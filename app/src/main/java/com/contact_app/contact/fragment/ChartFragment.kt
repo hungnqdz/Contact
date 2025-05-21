@@ -1,7 +1,6 @@
 package com.contact_app.contact.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ import com.contact_app.contact.model.TimeRange
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
 
 class ChartFragment : Fragment() {
     lateinit var viewBinding: FragmentChartBinding
@@ -105,7 +103,7 @@ class ChartFragment : Fragment() {
                     dbHelper.getCallLogStatistics(timeRange ?: TimeRange.ALL)
                 )
                 updatePieChart(listCallLogStats.map {
-                    PieEntry(it.totalDuration.toFloat(), it.contactName)
+                    PieEntry(it.callCount.toFloat(), it.contactName)
                 })
                 updateTopCallLogTable()
             }
@@ -123,8 +121,7 @@ class ChartFragment : Fragment() {
     }
 
     private fun updatePieChart(entries: List<PieEntry>) {
-        val filteredEntries = entries.filter { it.value.toInt() != 0 }
-        val pieDataSet = PieDataSet(filteredEntries, "")
+        val pieDataSet = PieDataSet(entries, "")
         pieDataSet.setColors(*Colors.CUSTOM_COLORS)
         viewBinding.pieChart.data = PieData(pieDataSet)
         pieDataSet.valueTextSize = 12f
